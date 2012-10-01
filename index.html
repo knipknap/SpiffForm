@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<head>
+  <title>SpiffForm Demo</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+  <link rel="stylesheet" href="spiffform/res/spiffform.css" />
+  <link rel="stylesheet" href="default.css" />
+  <link rel="stylesheet" type="text/css"
+    href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/base/jquery-ui.css"/>
+</head>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+<script src="spiffform/spiffform.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    spiffform_init($('#form'), $('#panel'));
+    spiffform_set_name($('#form'), 'Feedback Form Demo');
+    spiffform_set_subtitle($('#form'), 'Let us know what you think!');
+    var entry = spiffform_append($('#form'), 'spiffform-ui-entry');
+    entry.set_label('Complaint summary');
+    entry.set_text('Stop sending me emails');
+    var textbox = spiffform_append($('#form'), 'spiffform-ui-text');
+    textbox.set_label('Irrelevant text');
+    textbox.set_text('For the love of Jebus');
+    var checkbox = spiffform_append($('#form'), 'spiffform-ui-checkbox');
+    checkbox.set_label('Please send more spam to my inbox');
+    $(".ui-elements li").each(function() {
+        $(this).draggable({
+            "helper": function() {
+                return $(this).clone();
+            },
+            "cursorAt": {'right': -5},
+            "stop": function(event, ui) {
+                spiffform_insert_at(event, $(this).attr('name'));
+            }
+        });
+    });
+});
+</script>
+
+<body>
+
+<div id="header"><h1>SpiffForm Demo</h1></div>
+<div id="wrap">
+  <div id="center">
+    <div id="form" class="spiffform">
+    </div>
+  </div>
+
+  <div id="sidebar">
+    <div id="panel" class="spiffform-panel"></div>
+
+    <div id="sidebar-elements">
+      <h3>Text Input</h3>
+      <ul class="ui-elements">
+        <li id="ui-entry" name="spiffform-ui-entry">Single Line Text</li>
+        <li id="ui-text" name="spiffform-ui-text">Text Box</li>
+      </ul>
+
+      <!-- h3>Buttons</h3>
+      <ul class="ui-elements">
+        <li id="ui-button" name="spiffform-ui-button">Submit Form</li>
+      </ul -->
+
+      <h3>Other Elements</h3>
+      <ul class="ui-elements">
+        <li id="ui-checkbox" name="spiffform-ui-checkbox">Checkbox</li>
+        <li id="ui-calendar" name="spiffform-ui-calendar">Date Selector</li>
+        <li id="ui-combo" name="spiffform-ui-combo">Dropdown Field</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
