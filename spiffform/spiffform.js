@@ -272,50 +272,118 @@ SpiffFormCalendar.prototype = new SpiffFormElement();
 // -----------------------
 var SpiffFormCombo = function() {
     this._name = 'Combo Box';
+    this._label = 'Please choose'
     this._value = undefined;
-    this._items = ['test', 'test2']
+    this._items = []
+
+    this._get_select_elem = function() {
+        var select = $('<select></select>');
+        for (var i = 0, len = this._items.length; i < len; i++)
+            select.append('<option value="' + i + '">' + this._items[i] + '</option>');
+        select.val(this._value)
+        return select;
+    };
 
     this.update_html = function(elem) {
-        elem.append('<label>'+ this._get_label_html() + '<select></select></label>');
-        var select = elem.find('select');
-        for (var i = 0, len = this._items.length; i < len; i++)
-            select.append('<option>' + this._items[i] + '</option>');
-        select.val(this._value);
+        elem.append('<label>'+ this._get_label_html() + '</label>');
+        elem.find('label').append(this._get_select_elem());
     };
 
     this.update_properties = function(elem) {
         // Label text.
         elem.append(this._get_label_entry());
 
-        // Default value.
+        // List of options.
         var that = this;
-        elem.append('<div><label>Default:</label><ul></ul></div>');
+        elem.append('<div><label>Options:</label><ul></ul></div>');
         var ul = elem.find('ul');
+
+        // Click handler for the delete buttons in the option list.
+        function delete_button_clicked() {
+            var index = $(this).parent().index();
+            if (index < that._items.length)
+                that._items.splice(index, 1);
+            $(this).parent().remove();
+            that.trigger('changed');
+        }
+
+        // Handler for 'changed' events from the option list.
+        function entry_changed() {
+            var li = $(this).parent();
+            var index = li.index();
+            var is_last = li.is(':last');
+
+            // If all entry boxes are now filled, add another.
+            var empty = ul.find('input:text[value=""]');
+            if (empty.length === 0)
+                append_entry('');
+
+            // Was an existing entry changed, or was the last, empty box
+            // changed? (The last entry box may not have a corresponding entry
+            // in our array yet.)
+            if (!is_last) {
+                that._items[index] = $(this).val();
+                that.trigger('changed');
+                return;
+            }
+
+            // If the last entry box was cleared, remove the entry
+            // from our internal array, but leave the entry box available.
+            if ($(this).val() === '') {
+                if (index < that._items.length)
+                    that._items.splice(index, 1);
+                that.trigger('changed');
+                return;
+            }
+
+            // If the last entry box was filled, update our internal
+            // array, and add another entry box.
+            if (index < that._items.length)
+                that._items[index] = $(this).val();
+            if (index >= that._items.length)
+                that._items.push($(this).val());
+            that.trigger('changed');
+        }
+
+        // Appends one li to the option list.
         function append_entry(value) {
-            ul.append('<li><input type="text"/><input type="button" value="-"/></li>');
+            ul.append('<li>' +
+                      '<input type="text"/><input type="button" value="-"/>' +
+                      '</li>');
             var li = ul.find('li:last');
             var input = li.find('input[type=text]');
             input.val(value);
-            input.bind('keyup mouseup change', function() {
-                var index = li.index();
-                if (index > that._items.length)
-                    that._items.push($(this).val());
-                else
-                    that._items[index] = $(this).val();
-
-                // If all text inputs are now filled, add another.
-                var empty = ul.find('input:text[value=""]');
-                if (empty.length === 0)
-                    append_entry('');
-                that.trigger('changed');
-            });
+            input.bind('keyup mouseup change', entry_changed);
+            li.find('input[type=button]').click(delete_button_clicked);
         }
-        for (var i = 0, len = this._items.length; i < len; i++)
+
+        // Create the entries in the option list.
+        for (var i = 0, len = this._items.length; i < len || i < 2; i++)
             append_entry(this._items[i]);
-        append_entry('');
+        var empty = ul.find('input:text[value=""]');
+        if (empty.length === 0)
+            append_entry('');
+
+        // Initial value.
+        elem.append('<div><label>Default:</label></div>');
+        var select = this._get_select_elem();
+        elem.children('div:last').append(select);
+        select.change(function() {
+            that.select($(this).val());
+        });
 
         // Required checkbox.
         elem.append(this._get_required_checkbox());
+    };
+
+    this.add_option = function(option) {
+        this._items.push(option);
+        this.trigger('changed');
+    };
+
+    this.select = function(option) {
+        this._value = option;
+        this.trigger('changed');
     };
 };
 
