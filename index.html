@@ -35,21 +35,21 @@ $(document).ready(function() {
     form.set_name('Feedback Form Demo');
     form.set_subtitle('Let us know what you think!');
 
-    var choose = form.append('spiffform-ui-combo');
+    var choose = form.append(new SpiffFormCombo());
     choose.set_label('Complaint type');
     choose.add_option('');
     choose.add_option('Customer service');
     choose.select(1);
 
-    var entry = form.append('spiffform-ui-entry');
+    var entry = form.append(new SpiffFormEntry());
     entry.set_label('Complaint summary');
     entry.set_text('Stop sending me emails');
 
-    var textbox = form.append('spiffform-ui-text');
+    var textbox = form.append(new SpiffFormText());
     textbox.set_label('Irrelevant text');
     textbox.set_text('For the love of Jebus');
 
-    var checkbox = form.append('spiffform-ui-checkbox');
+    var checkbox = form.append(new SpiffFormCheckbox());
     checkbox.set_label('Please send more spam to my inbox');
 
     $(".ui-elements li").each(function() {
@@ -59,7 +59,8 @@ $(document).ready(function() {
             },
             "cursorAt": {'right': -5},
             "stop": function(event, ui) {
-                form.insert_at(event, $(this).attr('name'));
+                var cls = spiffform_elements[$(this).attr('name')];
+                form.insert_at(event, new cls());
             }
         });
     });
@@ -81,20 +82,20 @@ $(document).ready(function() {
     <div id="sidebar-elements">
       <h3>Text Input</h3>
       <ul class="ui-elements">
-        <li id="ui-entry" name="spiffform-ui-entry">Single Line Text</li>
-        <li id="ui-text" name="spiffform-ui-text">Text Box</li>
+        <li id="ui-entry" name="entry">Single Line Text</li>
+        <li id="ui-text" name="text">Text Box</li>
       </ul>
 
       <!-- h3>Buttons</h3>
       <ul class="ui-elements">
-        <li id="ui-button" name="spiffform-ui-button">Submit Form</li>
+        <li id="ui-button" name="button">Submit Form</li>
       </ul -->
 
       <h3>Other Elements</h3>
       <ul class="ui-elements">
-        <li id="ui-checkbox" name="spiffform-ui-checkbox">Checkbox</li>
-        <li id="ui-calendar" name="spiffform-ui-calendar">Date Selector</li>
-        <li id="ui-combo" name="spiffform-ui-combo">Dropdown Field</li>
+        <li id="ui-checkbox" name="checkbox">Checkbox</li>
+        <li id="ui-calendar" name="calendar">Date Selector</li>
+        <li id="ui-combo" name="combo">Dropdown Field</li>
       </ul>
     </div>
   </div>

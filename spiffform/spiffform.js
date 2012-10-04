@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ======================================================================
 // Form Editor Elements
 // ======================================================================
+var spiffform_elements = {};
+
 var SpiffFormElement = function() {
     this._name = 'unnamed';
     this._label = 'Label';
@@ -134,6 +136,8 @@ var SpiffFormEntry = function() {
 };
 
 SpiffFormEntry.prototype = new SpiffFormElement();
+SpiffFormEntry.prototype.handle = 'entry';
+spiffform_elements[SpiffFormEntry.prototype.handle] = SpiffFormEntry;
 
 // -----------------------
 // Text Box
@@ -172,11 +176,12 @@ var SpiffFormText = function() {
 };
 
 SpiffFormText.prototype = new SpiffFormElement();
+SpiffFormText.prototype.handle = 'text';
+spiffform_elements[SpiffFormText.prototype.handle] = SpiffFormText;
 
 // -----------------------
 // Button
 // -----------------------
-/*
 var SpiffFormButton = function() {
     this._name = 'Button';
 
@@ -190,7 +195,8 @@ var SpiffFormButton = function() {
 };
 
 SpiffFormButton.prototype = new SpiffFormElement();
-*/
+SpiffFormButton.prototype.handle = 'button';
+spiffform_elements[SpiffFormButton.prototype.handle] = SpiffFormButton;
 
 // -----------------------
 // Checkbox
@@ -230,11 +236,14 @@ var SpiffFormCheckbox = function() {
 };
 
 SpiffFormCheckbox.prototype = new SpiffFormElement();
+SpiffFormCheckbox.prototype.handle = 'checkbox';
+spiffform_elements[SpiffFormCheckbox.prototype.handle] = SpiffFormCheckbox;
 
 // -----------------------
 // Date Picker
 // -----------------------
 var SpiffFormCalendar = function() {
+    this.handle = 'calendar';
     this._name = 'Date Selector';
     this._label = 'Date';
 
@@ -266,11 +275,14 @@ var SpiffFormCalendar = function() {
 };
 
 SpiffFormCalendar.prototype = new SpiffFormElement();
+SpiffFormCalendar.prototype.handle = 'calendar';
+spiffform_elements[SpiffFormCalendar.prototype.handle] = SpiffFormCalendar;
 
 // -----------------------
 // Combo Box
 // -----------------------
 var SpiffFormCombo = function() {
+    this.handle = 'combo';
     this._name = 'Combo Box';
     this._label = 'Please choose';
     this._value = undefined;
@@ -388,15 +400,8 @@ var SpiffFormCombo = function() {
 };
 
 SpiffFormCombo.prototype = new SpiffFormElement();
-
-var spiffform_elements = {
-    'spiffform-ui-entry': SpiffFormEntry,
-    'spiffform-ui-text': SpiffFormText,
-//    'spiffform-ui-button': SpiffFormButton,
-    'spiffform-ui-checkbox': SpiffFormCheckbox,
-    'spiffform-ui-calendar': SpiffFormCalendar,
-    'spiffform-ui-combo': SpiffFormCombo
-};
+SpiffFormCombo.prototype.handle = 'combo';
+spiffform_elements[SpiffFormCombo.prototype.handle] = SpiffFormCombo;
 
 // ======================================================================
 // Form Editor
@@ -470,18 +475,17 @@ var SpiffFormEditor = function(form_div, panel) {
         return false;
     };
 
-    // Returns dom for a new form element of the given type.
-    this._create_element = function(element_type) {
-        var obj = new spiffform_elements[element_type]();
+    this._html_for_element = function(obj) {
+        var handle = Object.getPrototypeOf(obj).handle;
         var elem = $('<li class="spiffform-canvas-item">' +
-                     '<div class="spiffform-ui-element ' + element_type + '">' +
+                     '<div class="spiffform-ui-element spiffform-ui-' + handle + '">' +
                      '</div>' +
                      '</li>');
-        obj.update_html(elem.find('div'));
         elem.data('obj', obj);
         elem.click(this._element_clicked);
+        var div = elem.find('div');
+        obj.update_html(div);
         obj.bind('changed', function() {
-            var div = elem.find('.spiffform-ui-element');
             div.empty();
             obj.update_html(div);
         });
@@ -489,10 +493,12 @@ var SpiffFormEditor = function(form_div, panel) {
     };
 
     // Inserts a new element at the end of the form.
-    this.append = function(element_type) {
-        var elem = this._create_element(element_type);
+    this.append = function(obj) {
+        if (typeof obj === 'undefined')
+            throw new Error('object is required argument');
+        var elem = this._html_for_element(obj);
         this._form.find('.spiffform-canvas-elements').append(elem);
-        return elem.data('obj');
+        return obj;
     };
 
     // Removes the given element from the form. Expects an li element.
@@ -503,15 +509,17 @@ var SpiffFormEditor = function(form_div, panel) {
 
     // Inserts a new element at the position that is specified within the given
     // event.
-    this.insert_at = function(event, element_type) {
+    this.insert_at = function(event, obj) {
+        if (typeof obj === 'undefined')
+            throw new Error('object is required argument');
+
         // Make sure that the element was dropped within this form.
         var target = $(event.toElement);
-        var form = target.parents().andSelf().filter('div.spiffform').first();
-        if (!form.length)
+        if (!target.parents().andSelf().filter('div.spiffform').length)
             return;
 
         // Insert at the appropriate position, or append if this is the first item.
-        var elem = this._create_element(element_type);
+        var elem = this._html_for_element(obj);
         if (!target.is('li'))
             target = target.parents('li').first();
         if (target.is('li.spiffform-canvas-item'))
@@ -527,7 +535,6 @@ var SpiffFormEditor = function(form_div, panel) {
     };
 
     // Create the dom for the form.
-    this._form.data('panel', this._panel); // FIXME: get rid of
     this._form.append('<div class="spiffform-canvas">' +
                     '<ul class="spiffform-canvas-elements">' +
                     '<li><h2 class="spiffform-title"></h2></li>' +
