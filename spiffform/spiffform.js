@@ -103,7 +103,7 @@ var SpiffFormElement = function() {
 // -----------------------
 // Entry Box
 // -----------------------
-var SpiffFormEntry = function() {
+var SpiffFormEntryField = function() {
     this._name = 'Entry Field';
 
     this.update_html = function(elem) {
@@ -135,15 +135,15 @@ var SpiffFormEntry = function() {
     };
 };
 
-SpiffFormEntry.prototype = new SpiffFormElement();
-SpiffFormEntry.prototype.handle = 'entry';
-spiffform_elements[SpiffFormEntry.prototype.handle] = SpiffFormEntry;
+SpiffFormEntryField.prototype = new SpiffFormElement();
+SpiffFormEntryField.prototype.handle = 'entryfield';
+spiffform_elements[SpiffFormEntryField.prototype.handle] = SpiffFormEntryField;
 
 // -----------------------
 // Text Box
 // -----------------------
-var SpiffFormText = function() {
-    this._name = 'Text Box';
+var SpiffFormTextArea = function() {
+    this._name = 'Text Area';
     this._value = '';
 
     this.update_html = function(elem) {
@@ -175,9 +175,9 @@ var SpiffFormText = function() {
     };
 };
 
-SpiffFormText.prototype = new SpiffFormElement();
-SpiffFormText.prototype.handle = 'text';
-spiffform_elements[SpiffFormText.prototype.handle] = SpiffFormText;
+SpiffFormTextArea.prototype = new SpiffFormElement();
+SpiffFormTextArea.prototype.handle = 'textarea';
+spiffform_elements[SpiffFormTextArea.prototype.handle] = SpiffFormTextArea;
 
 // -----------------------
 // Button
@@ -190,7 +190,7 @@ var SpiffFormButton = function() {
     };
 
     this.update_properties = function(elem) {
-        elem.append('Button properties'); 
+        elem.append('Button properties');
     };
 };
 
@@ -242,9 +242,9 @@ spiffform_elements[SpiffFormCheckbox.prototype.handle] = SpiffFormCheckbox;
 // -----------------------
 // Date Picker
 // -----------------------
-var SpiffFormCalendar = function() {
+var SpiffFormDatePicker = function() {
     this.handle = 'calendar';
-    this._name = 'Date Selector';
+    this._name = 'Date Picker';
     this._label = 'Date';
 
     this.update_html = function(elem) {
@@ -274,16 +274,15 @@ var SpiffFormCalendar = function() {
     };
 };
 
-SpiffFormCalendar.prototype = new SpiffFormElement();
-SpiffFormCalendar.prototype.handle = 'calendar';
-spiffform_elements[SpiffFormCalendar.prototype.handle] = SpiffFormCalendar;
+SpiffFormDatePicker.prototype = new SpiffFormElement();
+SpiffFormDatePicker.prototype.handle = 'datepicker';
+spiffform_elements[SpiffFormDatePicker.prototype.handle] = SpiffFormDatePicker;
 
 // -----------------------
-// Combo Box
+// Dropdown List
 // -----------------------
-var SpiffFormCombo = function() {
-    this.handle = 'combo';
-    this._name = 'Combo Box';
+var SpiffFormDropdownList = function() {
+    this._name = 'Dropdown List';
     this._label = 'Please choose';
     this._value = undefined;
     this._items = [];
@@ -399,9 +398,9 @@ var SpiffFormCombo = function() {
     };
 };
 
-SpiffFormCombo.prototype = new SpiffFormElement();
-SpiffFormCombo.prototype.handle = 'combo';
-spiffform_elements[SpiffFormCombo.prototype.handle] = SpiffFormCombo;
+SpiffFormDropdownList.prototype = new SpiffFormElement();
+SpiffFormDropdownList.prototype.handle = 'dropdownlist';
+spiffform_elements[SpiffFormDropdownList.prototype.handle] = SpiffFormDropdownList;
 
 // ======================================================================
 // Form Editor
@@ -425,17 +424,17 @@ var SpiffFormEditor = function(form_div, panel) {
                y > elem.offset().top - distance &&
                y < elem.offset().top + elem.height() + distance;
     };
-    
+
     // Change the name/title of the form.
     this.set_name = function(name) {
         this._form.find('.spiffform-title').text(name);
     };
-    
+
     // Change the subtitle of the form.
     this.set_subtitle = function(subtitle) {
         this._form.find('.spiffform-subtitle').val(subtitle);
     };
-    
+
     // Change the hint shown underneath of the form.
     this.set_hint = function(hint) {
         var elem = this._form.find('.spiffform-canvas-hint');

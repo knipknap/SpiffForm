@@ -35,17 +35,17 @@ $(document).ready(function() {
     form.set_name('Feedback Form Demo');
     form.set_subtitle('Let us know what you think!');
 
-    var choose = form.append(new SpiffFormCombo());
+    var choose = form.append(new SpiffFormDropdownList());
     choose.set_label('Complaint type');
     choose.add_option('');
     choose.add_option('Customer service');
     choose.select(1);
 
-    var entry = form.append(new SpiffFormEntry());
+    var entry = form.append(new SpiffFormEntryField());
     entry.set_label('Complaint summary');
     entry.set_text('Stop sending me emails');
 
-    var textbox = form.append(new SpiffFormText());
+    var textbox = form.append(new SpiffFormTextArea());
     textbox.set_label('Irrelevant text');
     textbox.set_text('For the love of Jebus');
 
@@ -82,8 +82,8 @@ $(document).ready(function() {
     <div id="sidebar-elements">
       <h3>Text Input</h3>
       <ul class="ui-elements">
-        <li id="ui-entry" name="entry">Single Line Text</li>
-        <li id="ui-text" name="text">Text Box</li>
+        <li id="ui-entry" name="entryfield">Text Field (single line)</li>
+        <li id="ui-text" name="textarea">Text Area (multi line)</li>
       </ul>
 
       <!-- h3>Buttons</h3>
@@ -94,8 +94,8 @@ $(document).ready(function() {
       <h3>Other Elements</h3>
       <ul class="ui-elements">
         <li id="ui-checkbox" name="checkbox">Checkbox</li>
-        <li id="ui-calendar" name="calendar">Date Selector</li>
-        <li id="ui-combo" name="combo">Dropdown Field</li>
+        <li id="ui-calendar" name="datepicker">Date Picker</li>
+        <li id="ui-combo" name="dropdownlist">Dropdown List</li>
       </ul>
     </div>
   </div>
