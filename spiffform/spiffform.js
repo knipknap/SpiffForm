@@ -13,15 +13,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 // ======================================================================
-// Form Editor Elements
+// Utilities.
 // ======================================================================
-var spiffform_elements = {};
-
-var SpiffFormElement = function() {
-    this._name = 'unnamed';
-    this._label = 'Label';
-    this._required = true;
-    this._value = undefined;
+var SpiffFormTrackable = function() {
     this._listeners = {
         'changed': []
     };
@@ -40,6 +34,18 @@ var SpiffFormElement = function() {
         else
             this._listeners[event_name].push(listener);
     };
+};
+
+// ======================================================================
+// Form Editor Elements
+// ======================================================================
+var spiffform_elements = {};
+
+var SpiffFormElement = function() {
+    this._name = 'unnamed';
+    this._label = 'Label';
+    this._required = true;
+    this._value = undefined;
 
     this._get_required_mark_html = function() {
         if (this._required)
@@ -99,6 +105,8 @@ var SpiffFormElement = function() {
         this.trigger('changed');
     };
 };
+
+SpiffFormElement.prototype = new SpiffFormTrackable();
 
 // -----------------------
 // Entry Box
