@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Form Editor Elements
 // ======================================================================
 var SpiffFormElement = function() {
-    this._name = 'unnamed'
+    this._name = 'unnamed';
     this._label = 'Label';
     this._required = true;
     this._value = undefined;
@@ -42,7 +42,7 @@ var SpiffFormElement = function() {
     this._get_required_mark_html = function() {
         if (this._required)
             return '<span class="spiffform-required">*</span>';
-        return ''
+        return '';
     };
 
     this._get_label_html = function(with_colon) {
@@ -272,15 +272,15 @@ SpiffFormCalendar.prototype = new SpiffFormElement();
 // -----------------------
 var SpiffFormCombo = function() {
     this._name = 'Combo Box';
-    this._label = 'Please choose'
+    this._label = 'Please choose';
     this._value = undefined;
-    this._items = []
+    this._items = [];
 
     this._get_select_elem = function() {
         var select = $('<select></select>');
         for (var i = 0, len = this._items.length; i < len; i++)
             select.append('<option value="' + i + '">' + this._items[i] + '</option>');
-        select.val(this._value)
+        select.val(this._value);
         return select;
     };
 
