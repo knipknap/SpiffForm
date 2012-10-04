@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script type="text/javascript">
 $(document).ready(function() {
     var panel = new SpiffFormPanel($('#panel'));
-    var form = new SpiffFormEditor($('#form'), panel);
+    var form = new SpiffForm($('#form'));
     form.set_name('Feedback Form Demo');
     form.set_subtitle('Let us know what you think!');
 
@@ -52,16 +52,22 @@ $(document).ready(function() {
     var checkbox = form.append(new SpiffFormCheckbox());
     checkbox.set_label('Please send more spam to my inbox');
 
-    $(".ui-elements li").each(function() {
-        $(this).draggable({
-            "helper": function() {
-                return $(this).clone();
-            },
-            "cursorAt": {'right': -5},
-            "stop": function(event, ui) {
-                var cls = spiffform_elements[$(this).attr('name')];
-                form.insert_at(event, new cls());
-            }
+    $('#make-editable').click(function() {
+        $(this).slideToggle("slow");
+        $('#sidebar-elements').slideToggle("slow");
+        form.make_editable(panel);
+
+        $(".ui-elements li").each(function() {
+            $(this).draggable({
+                "helper": function() {
+                    return $(this).clone();
+                },
+                "cursorAt": {'right': -5},
+                "stop": function(event, ui) {
+                    var cls = spiffform_elements[$(this).attr('name')];
+                    form.insert_at(event, new cls());
+                }
+            });
         });
     });
 });
@@ -77,6 +83,7 @@ $(document).ready(function() {
   </div>
 
   <div id="sidebar">
+    <div id="make-editable"><input type="button" value="Make editable!"/></div>
     <div id="panel" class="spiffform-panel"></div>
 
     <div id="sidebar-elements">

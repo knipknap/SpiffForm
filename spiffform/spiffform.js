@@ -24,7 +24,8 @@ var SpiffFormTrackable = function() {
             return true;
         var listeners = this._listeners[event_name];
         for (var i = 0, len = listeners.length; i < len; i++)
-            listeners[i].apply(this, extra_args);
+            if (listeners[i].apply(this, extra_args) === false)
+                return false;
     };
 
     this.bind = function(event_name, listener) {
@@ -68,7 +69,7 @@ var SpiffFormElement = function() {
         input.val(this._label);
         input.bind('keyup mouseup change', function() {
             that._label = $(this).val();
-            that.trigger('properties-changed');
+            that.update();
         });
         return elem;
     };
@@ -82,7 +83,7 @@ var SpiffFormElement = function() {
         elem.find('input').prop('checked', this._required);
         elem.find('input').click(function(e) {
             that._required = $(this).is(':checked');
-            that.trigger('properties-changed');
+            that.update();
         });
         return elem;
     };
@@ -97,12 +98,12 @@ var SpiffFormElement = function() {
 
     this.set_label = function(label) {
         this._label = label;
-        this.trigger('changed');
+        return this.trigger('changed');
     };
 
     this.required = function(required) {
         this._required = required;
-        this.trigger('changed');
+        return this.trigger('changed');
     };
 };
 
@@ -139,7 +140,7 @@ var SpiffFormEntryField = function() {
         input.val(this._value);
         input.bind('keyup mouseup change', function() {
             that._value = $(this).val();
-            that.trigger('properties-changed');
+            that.update();
         });
 
         // Required checkbox.
@@ -188,7 +189,7 @@ var SpiffFormTextArea = function() {
         textarea.val(this._value);
         textarea.bind('keyup mouseup change', function() {
             that._value = $(this).val();
-            that.trigger('properties-changed');
+            that.update();
         });
 
         // Required checkbox.
@@ -266,7 +267,7 @@ var SpiffFormCheckbox = function() {
         checkbox.prop('checked', this._value);
         checkbox.click(function() {
             that._value = $(this).prop('checked');
-            that.trigger('properties-changed');
+            that.update();
         });
 
         // Required checkbox.
@@ -317,7 +318,7 @@ var SpiffFormDatePicker = function() {
         input.datepicker({
             'onSelect': function() {
                 that._value = $(this).datepicker('getDate');
-                that.trigger('properties-changed');
+                that.update();
             }
         });
         input.datepicker('setDate', this._value);
@@ -376,7 +377,7 @@ var SpiffFormDropdownList = function() {
             if (index < that._items.length)
                 that._items.splice(index, 1);
             $(this).parent().remove();
-            that.trigger('properties-changed');
+            that.update();
         }
 
         // Handler for 'changed' events from the option list.
@@ -395,8 +396,7 @@ var SpiffFormDropdownList = function() {
             // in our array yet.)
             if (!is_last) {
                 that._items[index] = $(this).val();
-                that.trigger('properties-changed');
-                return;
+                that.update();
             }
 
             // If the last entry box was cleared, remove the entry
@@ -404,8 +404,7 @@ var SpiffFormDropdownList = function() {
             if ($(this).val() === '') {
                 if (index < that._items.length)
                     that._items.splice(index, 1);
-                that.trigger('properties-changed');
-                return;
+                that.update();
             }
 
             // If the last entry box was filled, update our internal
@@ -414,7 +413,7 @@ var SpiffFormDropdownList = function() {
                 that._items[index] = $(this).val();
             if (index >= that._items.length)
                 that._items.push($(this).val());
-            that.trigger('properties-changed');
+            that.update();
         }
 
         // Appends one li to the option list.
@@ -464,41 +463,42 @@ SpiffFormDropdownList.prototype.handle = 'dropdownlist';
 spiffform_elements[SpiffFormDropdownList.prototype.handle] = SpiffFormDropdownList;
 
 // ======================================================================
-// Form Editor
+// Form
 // ======================================================================
-var SpiffFormEditor = function(form_div, panel) {
-    this._form = form_div;
-    this._panel = panel;
+var SpiffForm = function(div) {
+    this._div = div;
+    this._panel = undefined;
     var that = this;
 
-    if (this._form.length != 1)
+    if (this._div.length != 1)
         throw new Error('form selector needs to match exactly one element');
-    this._panel.hide();
 
     // Returns True if the given (mouse pointer) position is within the given
-    // distance around the given element.
-    this._in_element = function(elem, x, y, distance) {
+    // distance of the editor.
+    this.hits_form = function(x, y, distance) {
         if (typeof distance === 'undefined')
             distance = 0;
-        return x > elem.offset().left - distance &&
-               x < elem.offset().left + elem.width() + distance &&
-               y > elem.offset().top - distance &&
-               y < elem.offset().top + elem.height() + distance;
+        return x > that._div.offset().left - distance &&
+               x < that._div.offset().left + that._div.width() + distance &&
+               y > that._div.offset().top - distance &&
+               y < that._div.offset().top + that._div.height() + distance;
     };
 
     // Change the name/title of the form.
     this.set_name = function(name) {
-        this._form.find('.spiffform-title').text(name);
+        this._div.find('.spiffform-title').text(name);
     };
 
     // Change the subtitle of the form.
     this.set_subtitle = function(subtitle) {
-        this._form.find('.spiffform-subtitle').val(subtitle);
+        this._div.find('.spiffform-subtitle').val(subtitle);
     };
 
-    // Change the hint shown underneath of the form.
+    // Change the hint shown underneath of the form. Accepts either a dom
+    // element, plain text, or the following keywords:
+    //   drag, delete
     this.set_hint = function(hint) {
-        var elem = this._form.find('.spiffform-canvas-hint');
+        var elem = this._div.find('.spiffform-canvas-hint');
         var span = elem.find('span');
         elem.removeClass('spiffform-canvas-hint-arrow-right');
         elem.removeClass('spiffform-canvas-hint-delete');
@@ -510,42 +510,53 @@ var SpiffFormEditor = function(form_div, panel) {
             span.text('Drop here to remove');
             elem.addClass('spiffform-canvas-hint-delete');
         }
-        else {
-            span.text(hint);
+        else if (hint === '') {
+            elem.hide();
+            return;
         }
+        else if (typeof hint === 'object') {
+            elem.empty();
+            elem.append(hint);
+        }
+        else {
+            elem.text(hint);
+        }
+        elem.show();
+    };
+
+    // Show buttons below the form. Accepts a dom element, or the following
+    // keywords: submit.
+    // Returns the inserted dom element.
+    this.set_buttons = function(buttons) {
+        var elem = this._div.find('.spiffform-buttons');
+        if (buttons == 'submit')
+            buttons = $('<input type="submit"/>');
+        elem.empty();
+        elem.append(buttons);
+        return buttons;
     };
 
     // Unselect all items.
-    this.unselect = function(hide_panel) {
-        this._form.find('*').removeClass('spiffform-canvas-item-selected');
-        if (hide_panel || typeof hide_panel === 'undefined')
-            this._panel.hide('slow');
+    this.unselect = function() {
+        that._div.find('*').removeClass('spiffform-canvas-item-selected');
     };
 
-    // Select the given item. Expects an li element.
-    this.select = function(elem) {
-        this.unselect(false);
-        elem.addClass('spiffform-canvas-item-selected');
-        this._panel.show_properties(elem.data('obj'), elem);
+    // Select the given item. Expects an SpiffFormElement.
+    this.select = function(obj) {
+        that.unselect();
+        obj._div.parent().addClass('spiffform-canvas-item-selected');
     };
 
-    // Expects click events from li nodes.
-    this._element_clicked = function(event) {
-        that.select($(this));
-        return false;
-    };
-
-    this._attach_element = function(obj) {
+    this._attach = function(obj) {
         var handle = Object.getPrototypeOf(obj).handle;
         var elem = $('<li class="spiffform-canvas-item">' +
                      '<div class="spiffform-ui-element spiffform-ui-' + handle + '">' +
                      '</div>' +
                      '</li>');
         elem.data('obj', obj);
-        elem.click(this._element_clicked);
+        elem.click(function(e) { return that.trigger('clicked', [e, obj]); });
         var div = elem.find('div');
         obj.attach(div);
-        obj.bind('properties-changed', obj.update);
         return elem;
     };
 
@@ -553,14 +564,14 @@ var SpiffFormEditor = function(form_div, panel) {
     this.append = function(obj) {
         if (typeof obj === 'undefined')
             throw new Error('object is required argument');
-        var elem = this._attach_element(obj);
-        this._form.find('.spiffform-canvas-elements').append(elem);
+        var elem = this._attach(obj);
+        this._div.find('.spiffform-canvas-elements').append(elem);
         return obj;
     };
 
-    // Removes the given element from the form. Expects an li element.
-    this.remove = function(elem) {
-        elem.remove();
+    // Removes the given element from the form. Expects a SpiffFormElement.
+    this.remove = function(obj) {
+        obj._div.remove();
         this.unselect();
     };
 
@@ -576,70 +587,96 @@ var SpiffFormEditor = function(form_div, panel) {
             return;
 
         // Insert at the appropriate position, or append if this is the first item.
-        var elem = this._attach_element(obj);
+        var elem = this._attach(obj);
         if (!target.is('li'))
             target = target.parents('li').first();
         if (target.is('li.spiffform-canvas-item'))
             elem.insertBefore(target);
         else if (target.is('li')) {
             // Dropped on the form header.
-            elem.insertAfter(this._form.find('li:not(.spiffform-canvas-item):last'));
+            elem.insertAfter(this._div.find('li:not(.spiffform-canvas-item):last'));
         }
         else {
             // Dropped on the form, but not on the element list.
-            this._form.find('.spiffform-canvas-elements').append(elem);
+            this._div.find('.spiffform-canvas-elements').append(elem);
         }
     };
 
+    this.make_editable = function(panel) {
+        // Attach the panel.
+        if (typeof panel === 'undefined')
+            throw new Error('panel argument is required');
+        if (typeof this._panel !== 'undefined')
+            throw new Error('form is already attached to another panel');
+        this._panel = panel;
+        this._panel.hide();
+
+        // Some visual changes.
+        this.set_hint('drag');
+        this.set_buttons($(''));
+        this._div.addClass('spiffform-editor');
+        this._div.find('input.spiffform-subtitle').removeAttr("disabled");
+
+        // Initialize click events on the dom.
+        that._div.click(function() {
+            that.unselect();
+            that._panel.hide();
+        });
+        that.bind('clicked', function(e, obj) {
+            that.select(obj);
+            that._panel.show_properties(obj, obj._div);
+            return false;
+        });
+
+        // Make form sortable.
+        that._div.find('.spiffform-canvas-elements').sortable({
+            cancel: ':input:not([type=button])',
+            items: 'li.spiffform-canvas-item',
+            placeholder: 'spiffform-canvas-placeholder',
+            distance: 3,
+            axis: 'y',
+            containment: this._div,
+            forcePlaceholderSize: true,
+            receive: function(e, ui) {
+                ui.placeholder.toggle(true);
+            },
+            over: function(e, ui) {
+                ui.placeholder.toggle(true);
+            },
+            out: function(e, ui) {
+                ui.placeholder.toggle(false);
+            },
+            start: function(e, ui) {
+                //ui.placeholder.height(Math.min(30, ui.helper.outerHeight()));
+                that.set_hint('delete');
+            },
+            beforeStop: function(e, ui) {
+                that.set_hint('drag');
+                if (!ui.placeholder.is(':visible'))
+                    that.remove(ui.item.data('obj'));
+            }
+        });
+    };
+
     // Create the dom for the form.
-    this._form.append('<div class="spiffform-canvas">' +
-                    '<ul class="spiffform-canvas-elements">' +
-                    '<li><h2 class="spiffform-title"></h2></li>' +
-                    '<li><input type="text" class="spiffform-subtitle" name="subtitle" value=""/></li>' +
-                    '<li><hr/></li>' +
-                    '</ul>' +
-                    '<div class="spiffform-canvas-hint"><span></span></div>' +
-                    '</div>');
-    this._form.click(function() { that.unselect($(this)); });
+    this._div.append('<div class="spiffform-canvas">' +
+                     '<ul class="spiffform-canvas-elements">' +
+                     '<li><h2 class="spiffform-title"></h2></li>' +
+                     '<li><input type="text" class="spiffform-subtitle" name="subtitle" value=""/></li>' +
+                     '<li><hr/></li>' +
+                     '</ul>' +
+                     '<div class="spiffform-canvas-hint"><span></span></div>' +
+                     '<div class="spiffform-buttons"></div>' +
+                     '</div>');
+
+    this._div.find('input.spiffform-subtitle').attr("disabled", "disabled");
     this.set_name('Untitled');
     this.set_subtitle('Please fill out the form.');
-    this.set_hint('drag');
-
-    // Callback function that returns true if the given event happened within
-    // the form, returns false otherwise.
-    function in_form(e, ui) {
-        var form = $(e.toElement).parents('.spiffform').first();
-        return that._in_element(form, e.pageX, e.pageY, 40);
-    }
-
-    // Initialize the events on the dom.
-    this._form.find('.spiffform-canvas-elements').sortable({
-        cancel: ':input:not([type=button])',
-        items: 'li.spiffform-canvas-item',
-        placeholder: 'spiffform-canvas-placeholder',
-        distance: 3,
-        axis: 'y',
-        containment: this._form,
-        forcePlaceholderSize: true,
-        receive: function(e, ui) {
-            ui.placeholder.toggle(true);
-        },
-        over: function(e, ui) {
-            ui.placeholder.toggle(true);
-        },
-        out: function(e, ui) {
-            ui.placeholder.toggle(false);
-        },
-        start: function(e, ui) {
-            that.set_hint('delete');
-        },
-        beforeStop: function(e, ui) {
-            that.set_hint('drag');
-            if (!ui.placeholder.is(':visible'))
-                that.remove(ui.item);
-        }
-    });
+    this.set_hint('');
+    this.set_buttons('submit');
 };
+
+SpiffForm.prototype = new SpiffFormTrackable();
 
 // ======================================================================
 // Form Editor Panel (for showing properties, etc.)
@@ -652,7 +689,8 @@ var SpiffFormPanel = function(panel_div) {
 
     // Hide the panel.
     this.hide = function(speed) {
-        this._panel.hide(speed);
+        console.log(speed);
+        this._panel.slideUp(speed);
     };
 
     // Show properties for the given item. Expects an li element.
@@ -661,6 +699,6 @@ var SpiffFormPanel = function(panel_div) {
         this._panel.append('<h3>' + obj._name + ' Properties</h3>' +
                            '<div class="spiffform-panel-content"></div>');
         obj.update_properties(this._panel.find('div'));
-        this._panel.show('fast');
+        this._panel.slideDown("slow");
     };
 };

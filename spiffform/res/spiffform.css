@@ -65,17 +65,17 @@ background: #f0f2f8;
 border: 1px solid #f0f2f8;
 }
 
-.spiffform-canvas-elements li.spiffform-canvas-item:hover {
+.spiffform-editor li.spiffform-canvas-item:hover {
 background: #fffad7;
 border: 1px dashed #fe1;
 }
 
-.spiffform-canvas-elements li.spiffform-canvas-item-selected {
+.spiffform-editor li.spiffform-canvas-item-selected {
 background: #ffef78;
 border: 1px dashed #b69c00;
 }
 
-.spiffform-canvas-elements li.spiffform-canvas-item-selected:hover {
+.spiffform-editor li.spiffform-canvas-item-selected:hover {
 background: #fffad7;
 border: 1px dashed #fa1;
 }
@@ -167,6 +167,7 @@ padding: 0 3em;
 margin: 0 5px 15px 5px;
 background: #fefefe;
 border: 2px solid #ffef78;
+display: none;
 }
 
 .spiffform-panel h3 {

@@ -34,6 +34,20 @@ float: right;
 width: 270px;
 }
 
+#make-editable {
+text-align: center;
+}
+
+#make-editable input {
+padding: .5em;
+font-size: 1.4em;
+margin-bottom: 12px;
+}
+
+#sidebar-elements {
+display: none;
+}
+
 #sidebar-elements h3 {
 font-size: 1.3em;
 color: #e8ecf0;
