@@ -17,22 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ======================================================================
 var SpiffFormTrackable = function() {
     this._listeners = {
-        'changed': []
     };
 
-    this.trigger = function(event_name) {
-        if (!this._listeners[event_name] instanceof Array)
+    this.trigger = function(event_name, extra_args) {
+        if (!(this._listeners[event_name] instanceof Array))
             return true;
         var listeners = this._listeners[event_name];
         for (var i = 0, len = listeners.length; i < len; i++)
-            listeners[i].call(this);
+            listeners[i].apply(this, extra_args);
     };
 
     this.bind = function(event_name, listener) {
-        if (!this._listeners[event_name] instanceof Array)
-            this._listeners[event_name] = [listener];
-        else
+        if (this._listeners[event_name] instanceof Array)
             this._listeners[event_name].push(listener);
+        else
+            this._listeners[event_name] = [listener];
     };
 };
 
@@ -43,6 +42,7 @@ var spiffform_elements = {};
 
 var SpiffFormElement = function() {
     this._name = 'unnamed';
+    this._div = undefined;
     this._label = 'Label';
     this._required = true;
     this._value = undefined;
@@ -68,7 +68,7 @@ var SpiffFormElement = function() {
         input.val(this._label);
         input.bind('keyup mouseup change', function() {
             that._label = $(this).val();
-            that.trigger('changed');
+            that.trigger('properties-changed');
         });
         return elem;
     };
@@ -82,13 +82,13 @@ var SpiffFormElement = function() {
         elem.find('input').prop('checked', this._required);
         elem.find('input').click(function(e) {
             that._required = $(this).is(':checked');
-            that.trigger('changed');
+            that.trigger('properties-changed');
         });
         return elem;
     };
 
-    this.update_html = function() {
-        throw new Error("SpiffFormElement object missing update_html().");
+    this.update = function() {
+        throw new Error("SpiffFormElement object missing update().");
     };
 
     this.update_properties = function(elem) {
@@ -113,10 +113,19 @@ SpiffFormElement.prototype = new SpiffFormTrackable();
 // -----------------------
 var SpiffFormEntryField = function() {
     this._name = 'Entry Field';
+    var that = this;
 
-    this.update_html = function(elem) {
-        elem.append('<label>' + this._get_label_html() + '<input type="text"/></label>');
-        elem.find('input').val(this._value);
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<label>' + that._get_label_html() + '<input type="text"/></label>');
+        that._div.find('input:text').val(that._value);
     };
 
     this.update_properties = function(elem) {
@@ -130,7 +139,7 @@ var SpiffFormEntryField = function() {
         input.val(this._value);
         input.bind('keyup mouseup change', function() {
             that._value = $(this).val();
-            that.trigger('changed');
+            that.trigger('properties-changed');
         });
 
         // Required checkbox.
@@ -139,7 +148,7 @@ var SpiffFormEntryField = function() {
 
     this.set_text = function(text) {
         this._value = text;
-        this.trigger('changed');
+        this.update();
     };
 };
 
@@ -153,10 +162,19 @@ spiffform_elements[SpiffFormEntryField.prototype.handle] = SpiffFormEntryField;
 var SpiffFormTextArea = function() {
     this._name = 'Text Area';
     this._value = '';
+    var that = this;
 
-    this.update_html = function(elem) {
-        elem.append('<label>'+ this._get_label_html() + '<textarea></textarea></label>');
-        elem.find('textarea').text(this._value);
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<label>'+ that._get_label_html() + '<textarea></textarea></label>');
+        that._div.find('textarea').text(that._value);
     };
 
     this.update_properties = function(elem) {
@@ -170,7 +188,7 @@ var SpiffFormTextArea = function() {
         textarea.val(this._value);
         textarea.bind('keyup mouseup change', function() {
             that._value = $(this).val();
-            that.trigger('changed');
+            that.trigger('properties-changed');
         });
 
         // Required checkbox.
@@ -179,7 +197,7 @@ var SpiffFormTextArea = function() {
 
     this.set_text = function(text) {
         this._value = text;
-        this.trigger('changed');
+        this.update();
     };
 };
 
@@ -192,9 +210,18 @@ spiffform_elements[SpiffFormTextArea.prototype.handle] = SpiffFormTextArea;
 // -----------------------
 var SpiffFormButton = function() {
     this._name = 'Button';
+    var that = this;
 
-    this.update_html = function(elem) {
-        elem.append('<input type="button" value="Label"/>');
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<input type="button" value="Label"/>');
     };
 
     this.update_properties = function(elem) {
@@ -213,10 +240,19 @@ var SpiffFormCheckbox = function() {
     this._label = 'Please send more spam to my inbox';
     this._name = 'Checkbox';
     this._value = false;
+    var that = this;
 
-    this.update_html = function(elem) {
-        elem.append('<label><input type="checkbox"/>' + this._get_label_html(false) + '</label>');
-        elem.find('input').prop('checked', this._value);
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<label><input type="checkbox"/>' + that._get_label_html(false) + '</label>');
+        that._div.find('input').prop('checked', that._value);
     };
 
     this.update_properties = function(elem) {
@@ -230,7 +266,7 @@ var SpiffFormCheckbox = function() {
         checkbox.prop('checked', this._value);
         checkbox.click(function() {
             that._value = $(this).prop('checked');
-            that.trigger('changed');
+            that.trigger('properties-changed');
         });
 
         // Required checkbox.
@@ -239,7 +275,7 @@ var SpiffFormCheckbox = function() {
 
     this.select = function(selected) {
         this._value = selected || typeof selected === 'undefined';
-        this.trigger('changed');
+        this.update();
     };
 };
 
@@ -254,11 +290,20 @@ var SpiffFormDatePicker = function() {
     this.handle = 'calendar';
     this._name = 'Date Picker';
     this._label = 'Date';
+    var that = this;
 
-    this.update_html = function(elem) {
-        elem.append('<label>'+ this._get_label_html() + '<input type="text"/></label>');
-        var input = elem.find('input').datepicker();
-        input.datepicker('setDate', this._value);
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<label>'+ that._get_label_html() + '<input type="text"/></label>');
+        var input = that._div.find('input').datepicker();
+        input.datepicker('setDate', that._value);
     };
 
     this.update_properties = function(elem) {
@@ -272,7 +317,7 @@ var SpiffFormDatePicker = function() {
         input.datepicker({
             'onSelect': function() {
                 that._value = $(this).datepicker('getDate');
-                that.trigger('changed');
+                that.trigger('properties-changed');
             }
         });
         input.datepicker('setDate', this._value);
@@ -292,8 +337,13 @@ spiffform_elements[SpiffFormDatePicker.prototype.handle] = SpiffFormDatePicker;
 var SpiffFormDropdownList = function() {
     this._name = 'Dropdown List';
     this._label = 'Please choose';
-    this._value = undefined;
     this._items = [];
+    var that = this;
+
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
 
     this._get_select_elem = function() {
         var select = $('<select></select>');
@@ -303,9 +353,12 @@ var SpiffFormDropdownList = function() {
         return select;
     };
 
-    this.update_html = function(elem) {
-        elem.append('<label>'+ this._get_label_html() + '</label>');
-        elem.find('label').append(this._get_select_elem());
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<label>'+ that._get_label_html() + '</label>');
+        that._div.find('label').append(that._get_select_elem());
     };
 
     this.update_properties = function(elem) {
@@ -323,7 +376,7 @@ var SpiffFormDropdownList = function() {
             if (index < that._items.length)
                 that._items.splice(index, 1);
             $(this).parent().remove();
-            that.trigger('changed');
+            that.trigger('properties-changed');
         }
 
         // Handler for 'changed' events from the option list.
@@ -342,7 +395,7 @@ var SpiffFormDropdownList = function() {
             // in our array yet.)
             if (!is_last) {
                 that._items[index] = $(this).val();
-                that.trigger('changed');
+                that.trigger('properties-changed');
                 return;
             }
 
@@ -351,7 +404,7 @@ var SpiffFormDropdownList = function() {
             if ($(this).val() === '') {
                 if (index < that._items.length)
                     that._items.splice(index, 1);
-                that.trigger('changed');
+                that.trigger('properties-changed');
                 return;
             }
 
@@ -361,7 +414,7 @@ var SpiffFormDropdownList = function() {
                 that._items[index] = $(this).val();
             if (index >= that._items.length)
                 that._items.push($(this).val());
-            that.trigger('changed');
+            that.trigger('properties-changed');
         }
 
         // Appends one li to the option list.
@@ -397,12 +450,12 @@ var SpiffFormDropdownList = function() {
 
     this.add_option = function(option) {
         this._items.push(option);
-        this.trigger('changed');
+        this.update();
     };
 
     this.select = function(option) {
         this._value = option;
-        this.trigger('changed');
+        this.update();
     };
 };
 
@@ -482,7 +535,7 @@ var SpiffFormEditor = function(form_div, panel) {
         return false;
     };
 
-    this._html_for_element = function(obj) {
+    this._attach_element = function(obj) {
         var handle = Object.getPrototypeOf(obj).handle;
         var elem = $('<li class="spiffform-canvas-item">' +
                      '<div class="spiffform-ui-element spiffform-ui-' + handle + '">' +
@@ -491,11 +544,8 @@ var SpiffFormEditor = function(form_div, panel) {
         elem.data('obj', obj);
         elem.click(this._element_clicked);
         var div = elem.find('div');
-        obj.update_html(div);
-        obj.bind('changed', function() {
-            div.empty();
-            obj.update_html(div);
-        });
+        obj.attach(div);
+        obj.bind('properties-changed', obj.update);
         return elem;
     };
 
@@ -503,7 +553,7 @@ var SpiffFormEditor = function(form_div, panel) {
     this.append = function(obj) {
         if (typeof obj === 'undefined')
             throw new Error('object is required argument');
-        var elem = this._html_for_element(obj);
+        var elem = this._attach_element(obj);
         this._form.find('.spiffform-canvas-elements').append(elem);
         return obj;
     };
@@ -526,7 +576,7 @@ var SpiffFormEditor = function(form_div, panel) {
             return;
 
         // Insert at the appropriate position, or append if this is the first item.
-        var elem = this._html_for_element(obj);
+        var elem = this._attach_element(obj);
         if (!target.is('li'))
             target = target.parents('li').first();
         if (target.is('li.spiffform-canvas-item'))
