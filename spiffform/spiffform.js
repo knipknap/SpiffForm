@@ -36,6 +36,60 @@ var SpiffFormTrackable = function() {
     };
 };
 
+var _SpiffFormObjectSerializer = function() {
+    this.serialize_element = function(obj) {
+        return {'handle': obj.get_handle(),
+                'label': obj._label,
+                'value': obj._value,
+                'required': obj._required};
+    };
+
+    this.serialize_entryfield = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.serialize_textarea = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.serialize_button = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.serialize_checkbox = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.serialize_datepicker = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.serialize_dropdownlist = function(obj) {
+        var data = this.serialize_element(obj);
+        data.items = obj._items.slice(0);
+        return data;
+    };
+
+    this.serialize_form = function(form) {
+        var that = this;
+        var list = [];
+        form._div.find('li.spiffform-canvas-item').each(function() {
+            var obj = $(this).data('obj');
+            list.push(obj.serialize(that));
+        });
+        return {'subtitle': form._subtitle,
+                'elements': list};
+    };
+};
+
+var _SpiffFormJSONSerializer = function() {
+    this.serialize_form = function(form) {
+        return JSON.stringify(Object.getPrototypeOf(this).serialize_form(form));
+    };
+};
+_SpiffFormJSONSerializer.prototype = new _SpiffFormObjectSerializer();
+var SpiffFormJSONSerializer = new _SpiffFormJSONSerializer();
+
 // ======================================================================
 // Form Editor Elements
 // ======================================================================
@@ -47,6 +101,10 @@ var SpiffFormElement = function() {
     this._label = 'Label';
     this._required = true;
     this._value = undefined;
+
+    this.get_handle = function() {
+        return Object.getPrototypeOf(this).handle;
+    };
 
     this._get_required_mark_html = function() {
         if (this._required)
@@ -105,6 +163,10 @@ var SpiffFormElement = function() {
         this._required = required;
         return this.trigger('changed');
     };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_element(this);
+    };
 };
 
 SpiffFormElement.prototype = new SpiffFormTrackable();
@@ -150,6 +212,10 @@ var SpiffFormEntryField = function() {
     this.set_text = function(text) {
         this._value = text;
         this.update();
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_entryfield(this);
     };
 };
 
@@ -200,6 +266,10 @@ var SpiffFormTextArea = function() {
         this._value = text;
         this.update();
     };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_textarea(this);
+    };
 };
 
 SpiffFormTextArea.prototype = new SpiffFormElement();
@@ -227,6 +297,10 @@ var SpiffFormButton = function() {
 
     this.update_properties = function(elem) {
         elem.append('Button properties');
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_button(this);
     };
 };
 
@@ -278,6 +352,10 @@ var SpiffFormCheckbox = function() {
         this._value = selected || typeof selected === 'undefined';
         this.update();
     };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_checkbox(this);
+    };
 };
 
 SpiffFormCheckbox.prototype = new SpiffFormElement();
@@ -325,6 +403,10 @@ var SpiffFormDatePicker = function() {
 
         // Required checkbox.
         elem.append(this._get_required_checkbox());
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_datepicker(this);
     };
 };
 
@@ -456,6 +538,10 @@ var SpiffFormDropdownList = function() {
         this._value = option;
         this.update();
     };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_dropdownlist(this);
+    };
 };
 
 SpiffFormDropdownList.prototype = new SpiffFormElement();
@@ -548,7 +634,7 @@ var SpiffForm = function(div) {
     };
 
     this._attach = function(obj) {
-        var handle = Object.getPrototypeOf(obj).handle;
+        var handle = obj.get_handle();
         var elem = $('<li class="spiffform-canvas-item">' +
                      '<div class="spiffform-ui-element spiffform-ui-' + handle + '">' +
                      '</div>' +
@@ -571,7 +657,7 @@ var SpiffForm = function(div) {
 
     // Removes the given element from the form. Expects a SpiffFormElement.
     this.remove = function(obj) {
-        obj._div.remove();
+        obj._div.parent().remove();
         this.unselect();
     };
 
@@ -658,6 +744,10 @@ var SpiffForm = function(div) {
         });
     };
 
+    this.serialize = function(serializer) {
+        return serializer.serialize_form(this);
+    };
+
     // Create the dom for the form.
     this._div.append('<div class="spiffform-canvas">' +
                      '<ul class="spiffform-canvas-elements">' +
@@ -689,7 +779,6 @@ var SpiffFormPanel = function(panel_div) {
 
     // Hide the panel.
     this.hide = function(speed) {
-        console.log(speed);
         this._panel.slideUp(speed);
     };
 

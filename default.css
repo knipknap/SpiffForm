@@ -34,11 +34,13 @@ float: right;
 width: 270px;
 }
 
-#make-editable {
+#make-editable,
+#serialize {
 text-align: center;
 }
 
-#make-editable input {
+#make-editable input,
+#serialize input {
 padding: .5em;
 font-size: 1.4em;
 margin-bottom: 12px;

@@ -70,6 +70,9 @@ $(document).ready(function() {
             });
         });
     });
+    $('#serialize').click(function() {
+        alert(form.serialize(SpiffFormJSONSerializer));
+    });
 });
 </script>
 
@@ -105,6 +108,8 @@ $(document).ready(function() {
         <li id="ui-combo" name="dropdownlist">Dropdown List</li>
       </ul>
     </div>
+
+    <div id="serialize"><input type="button" value="Serialize"/></div>
   </div>
 </div>
 
