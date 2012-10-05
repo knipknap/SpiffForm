@@ -35,15 +35,20 @@ width: 270px;
 }
 
 #make-editable,
-#serialize {
+#serialize,
+#serialize-deserialize {
 text-align: center;
 }
 
 #make-editable input,
-#serialize input {
+#serialize input,
+#serialize-deserialize input {
 padding: .5em;
-font-size: 1.4em;
 margin-bottom: 12px;
+}
+
+#make-editable input {
+font-size: 1.4em;
 }
 
 #sidebar-elements {

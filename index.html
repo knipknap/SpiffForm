@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 $(document).ready(function() {
     var panel = new SpiffFormPanel($('#panel'));
     var form = new SpiffForm($('#form'));
-    form.set_name('Feedback Form Demo');
+    form.set_title('Feedback Form Demo');
     form.set_subtitle('Let us know what you think!');
 
     var choose = form.append(new SpiffFormDropdownList());
@@ -73,6 +73,9 @@ $(document).ready(function() {
     $('#serialize').click(function() {
         alert(form.serialize(SpiffFormJSONSerializer));
     });
+    $('#serialize-deserialize').click(function() {
+        form.deserialize(SpiffFormJSONSerializer, form.serialize(SpiffFormJSONSerializer));
+    });
 });
 </script>
 
@@ -110,6 +113,7 @@ $(document).ready(function() {
     </div>
 
     <div id="serialize"><input type="button" value="Serialize"/></div>
+    <div id="serialize-deserialize"><input type="button" value="Serialize / Deserialize"/></div>
   </div>
 </div>
 
