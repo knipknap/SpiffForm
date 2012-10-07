@@ -853,7 +853,7 @@ var SpiffForm = function(div) {
     this._div.append('<div class="spiffform-canvas">' +
                      '<ul class="spiffform-canvas-elements">' +
                      '<li><h2 class="spiffform-title"></h2></li>' +
-                     '<li><input type="text" class="spiffform-subtitle" name="subtitle" value=""/></li>' +
+                     '<li><input type="text" class="spiffform-subtitle"/></li>' +
                      '<li><hr/></li>' +
                      '</ul>' +
                      '<div class="spiffform-canvas-hint"><span></span></div>' +
