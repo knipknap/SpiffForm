@@ -655,12 +655,12 @@ var SpiffForm = function(div) {
 
     // Returns the name/title of the form.
     this.get_title = function() {
-        return this._div.find('.spiffform-title').text();
+        return this._div.find('.spiffform-title').val();
     };
 
     // Change the name/title of the form.
-    this.set_title = function(name) {
-        this._div.find('.spiffform-title').text(name);
+    this.set_title = function(title) {
+        this._div.find('.spiffform-title').val(title);
     };
 
     // Returns the subtitle of the form.
@@ -852,7 +852,7 @@ var SpiffForm = function(div) {
     // Create the dom for the form.
     this._div.append('<div class="spiffform-canvas">' +
                      '<ul class="spiffform-canvas-elements">' +
-                     '<li><h2 class="spiffform-title"></h2></li>' +
+                     '<li><input type="text" class="spiffform-title"/></li>' +
                      '<li><input type="text" class="spiffform-subtitle"/></li>' +
                      '<li><hr/></li>' +
                      '</ul>' +

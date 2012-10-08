@@ -8,8 +8,6 @@ margin: 0 auto;
 padding: 10px 20px;
 }
 
-.spiffform-title,
-.spiffform-subtitle,
 .spiffform-canvas {
 margin: 0;
 padding: 0;
@@ -20,11 +18,13 @@ font-size: 1.4em;
 color: #700;
 margin: 0 .2em .2em .2em;
 text-align: left;
+background: #f0f2f8;
+border: 0;
 }
 
 .spiffform-subtitle {
 font-size: 1.05em;
-font-weight:normal;
+font-weight: normal;
 width: 680px;
 color: #500;
 background: #f0f2f8;
