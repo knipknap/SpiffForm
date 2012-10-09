@@ -1157,7 +1157,7 @@ var SpiffForm = function(div) {
         });
         if (has_errors)
             that.set_hint('validationerror');
-        return has_errors;
+        return !has_errors;
     };
 
     this.serialize = function(serializer) {
