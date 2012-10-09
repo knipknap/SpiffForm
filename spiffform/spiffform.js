@@ -369,7 +369,7 @@ var SpiffFormTitle = function() {
 };
 
 SpiffFormTitle.prototype = new SpiffFormElement();
-spiffform_elements[SpiffFormTitle.prototype.handle] = SpiffFormTitle;
+spiffform_elements.title = SpiffFormTitle;
 
 // -----------------------
 // Subtitle
@@ -422,7 +422,7 @@ var SpiffFormSubtitle = function() {
 };
 
 SpiffFormSubtitle.prototype = new SpiffFormTitle();
-spiffform_elements[SpiffFormSubtitle.prototype.handle] = SpiffFormSubtitle;
+spiffform_elements.subtitle = SpiffFormSubtitle;
 
 // -----------------------
 // Horizontal Separator
@@ -462,7 +462,7 @@ var SpiffFormSeparator = function() {
 };
 
 SpiffFormSeparator.prototype = new SpiffFormElement();
-spiffform_elements[SpiffFormSeparator.prototype.handle] = SpiffFormSeparator;
+spiffform_elements.separator = SpiffFormSeparator;
 
 // -----------------------
 // Entry Box
@@ -537,8 +537,7 @@ var SpiffFormEntryField = function() {
 };
 
 SpiffFormEntryField.prototype = new SpiffFormElement();
-SpiffFormEntryField.prototype.handle = 'entryfield';
-spiffform_elements[SpiffFormEntryField.prototype.handle] = SpiffFormEntryField;
+spiffform_elements.entryfield = SpiffFormEntryField;
 
 // -----------------------
 // Text Box
@@ -613,7 +612,7 @@ var SpiffFormTextArea = function() {
 };
 
 SpiffFormTextArea.prototype = new SpiffFormElement();
-spiffform_elements[SpiffFormTextArea.prototype.handle] = SpiffFormTextArea;
+spiffform_elements.textarea = SpiffFormTextArea;
 
 // -----------------------
 // Button
@@ -652,7 +651,7 @@ var SpiffFormButton = function() {
 };
 
 SpiffFormButton.prototype = new SpiffFormElement();
-spiffform_elements[SpiffFormButton.prototype.handle] = SpiffFormButton;
+spiffform_elements.button = SpiffFormButton;
 
 // -----------------------
 // Checkbox
@@ -728,7 +727,7 @@ var SpiffFormCheckbox = function() {
 };
 
 SpiffFormCheckbox.prototype = new SpiffFormElement();
-spiffform_elements[SpiffFormCheckbox.prototype.handle] = SpiffFormCheckbox;
+spiffform_elements.checkbox = SpiffFormCheckbox;
 
 // -----------------------
 // Date Picker
@@ -820,7 +819,7 @@ var SpiffFormDatePicker = function() {
 };
 
 SpiffFormDatePicker.prototype = new SpiffFormElement();
-spiffform_elements[SpiffFormDatePicker.prototype.handle] = SpiffFormDatePicker;
+spiffform_elements.datepicker = SpiffFormDatePicker;
 
 // -----------------------
 // Dropdown List
@@ -981,7 +980,7 @@ var SpiffFormDropdownList = function() {
 };
 
 SpiffFormDropdownList.prototype = new SpiffFormElement();
-spiffform_elements[SpiffFormDropdownList.prototype.handle] = SpiffFormDropdownList;
+spiffform_elements.dropdownlist = SpiffFormDropdownList;
 
 // ======================================================================
 // Form
