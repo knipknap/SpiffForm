@@ -120,6 +120,13 @@ width: 664px;
 height: 140px;
 }
 
+.spiffform-canvas-item-error {
+display: block;
+color: red;
+text-align: left;
+padding-left: 5px;
+}
+
 .spiffform-canvas-elements .spiffform-ui-checkbox label {
 text-align: left;
 width: 670px;

@@ -156,6 +156,7 @@ var SpiffFormElement = function() {
     this._label = 'Label';
     this._required = true;
     this._value = undefined;
+    this._id = (new Date()).getTime();
 
     this.get_handle = function() {
         return Object.getPrototypeOf(this).handle;
@@ -214,9 +215,28 @@ var SpiffFormElement = function() {
         return this.trigger('changed');
     };
 
+    this.set_error = function(text) {
+        var span = this._div.find('.spiffform-canvas-item-error');
+        if (typeof text === 'undefined')
+            span.slideUp('fast');
+        else {
+            span.text(text);
+            span.slideDown('fast');
+        }
+    };
+
     this.required = function(required) {
         this._required = required;
         return this.trigger('changed');
+    };
+
+    this.validate = function() {
+        if (this._required && typeof this._value === 'undefined') {
+            this.set_error('This field is required.');
+            return false;
+        }
+        this.set_error();
+        return true;
     };
 
     this.serialize = function(serializer) {
@@ -235,6 +255,7 @@ SpiffFormElement.prototype = new SpiffFormTrackable();
 // -----------------------
 var SpiffFormEntryField = function() {
     this._name = 'Entry Field';
+    this._value = '';
     var that = this;
 
     this.attach = function(div) {
@@ -247,7 +268,13 @@ var SpiffFormEntryField = function() {
             return;
         that._div.empty();
         that._div.append('<label>' + that._get_label_html() + '<input type="text"/></label>');
-        that._div.find('input:text').val(that._value);
+        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        var input = that._div.find('input:text');
+        input.val(that._value);
+        input.bind('keyup mouseup change', function() {
+            that._value = $(this).val();
+            that.validate();
+        });
     };
 
     this.update_properties = function(elem) {
@@ -256,7 +283,9 @@ var SpiffFormEntryField = function() {
 
         // Default value.
         var that = this;
-        elem.append('<div><label>Default: <input type="text" name="default"/></label></div>');
+        elem.append('<div>' +
+                    '<label>Default: <input type="text" name="default"/></label>' +
+                    '</div>');
         var input = elem.find('input[name=default]');
         input.val(this._value);
         input.bind('keyup mouseup change', function() {
@@ -271,6 +300,15 @@ var SpiffFormEntryField = function() {
     this.set_text = function(text) {
         this._value = text;
         this.update();
+    };
+
+    this.validate = function() {
+        if (this._required && this._value === '') {
+            this.set_error('This field is required.');
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
     };
 
     this.serialize = function(serializer) {
@@ -304,7 +342,13 @@ var SpiffFormTextArea = function() {
             return;
         that._div.empty();
         that._div.append('<label>'+ that._get_label_html() + '<textarea></textarea></label>');
-        that._div.find('textarea').text(that._value);
+        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        var textarea = that._div.find('textarea');
+        textarea.val(that._value);
+        textarea.bind('keyup mouseup change', function() {
+            that._value = $(this).val();
+            that.validate();
+        });
     };
 
     this.update_properties = function(elem) {
@@ -328,6 +372,15 @@ var SpiffFormTextArea = function() {
     this.set_text = function(text) {
         this._value = text;
         this.update();
+    };
+
+    this.validate = function() {
+        if (this._required && this._value === '') {
+            this.set_error('This field is required.');
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
     };
 
     this.serialize = function(serializer) {
@@ -398,7 +451,13 @@ var SpiffFormCheckbox = function() {
             return;
         that._div.empty();
         that._div.append('<label><input type="checkbox"/>' + that._get_label_html(false) + '</label>');
-        that._div.find('input').prop('checked', that._value);
+        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        var checkbox = that._div.find('input');
+        checkbox.prop('checked', that._value);
+        checkbox.click(function() {
+            that._value = $(this).prop('checked');
+            that.validate();
+        });
     };
 
     this.update_properties = function(elem) {
@@ -422,6 +481,15 @@ var SpiffFormCheckbox = function() {
     this.select = function(selected) {
         this._value = selected || typeof selected === 'undefined';
         this.update();
+    };
+
+    this.validate = function() {
+        if (this._required && !this._value) {
+            this.set_error('This box must be checked to continue.');
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
     };
 
     this.serialize = function(serializer) {
@@ -456,8 +524,27 @@ var SpiffFormDatePicker = function() {
             return;
         that._div.empty();
         that._div.append('<label>'+ that._get_label_html() + '<input type="text"/></label>');
-        var input = that._div.find('input').datepicker();
-        input.datepicker('setDate', that._value);
+        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+
+        // A datepicker requires a unique id, else it will expose some weird
+        // behavior as soon as multiple datepickers are used.
+        var input = that._div.find('input');
+        input.attr('id', 'spiffform-datepicker' + that._id);
+
+        // Init the datepicker.
+        var picker = input.datepicker({
+            onSelect: function(dateText, inst) {
+                that._value = $(this).datepicker('getDate');
+                that.validate();
+            }
+        });
+        picker.datepicker('setDate', that._value);
+
+        // Bind an event for validating the input.
+        input.bind('change', function() {
+            that._value = $(this).datepicker('getDate');
+            that.validate();
+        });
     };
 
     this.update_properties = function(elem) {
@@ -465,19 +552,33 @@ var SpiffFormDatePicker = function() {
         elem.append(this._get_label_entry());
 
         // Default value.
-        var that = this;
         elem.append('<div><label>Default: <input type="text" name="default"/></label></div>');
+
+        // A datepicker requires a unique id, else it will expose some weird
+        // behavior as soon as multiple datepickers are used.
         var input = elem.find('input[name=default]');
-        input.datepicker({
-            'onSelect': function() {
+        input.attr('id', 'spiffform-datepicker-prop' + that._id);
+
+        // Init the datepicker.
+        var picker = input.datepicker({
+            onSelect: function(dateText, inst) {
                 that._value = $(this).datepicker('getDate');
                 that.update();
             }
         });
-        input.datepicker('setDate', this._value);
+        picker.datepicker('setDate', that._value);
 
         // Required checkbox.
         elem.append(this._get_required_checkbox());
+    };
+
+    this.validate = function() {
+        if (this._required && this._value === null) {
+            this.set_error('This field is required.');
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
     };
 
     this.serialize = function(serializer) {
@@ -521,6 +622,12 @@ var SpiffFormDropdownList = function() {
         that._div.empty();
         that._div.append('<label>'+ that._get_label_html() + '</label>');
         that._div.find('label').append(that._get_select_elem());
+        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        var select = that._div.find('select');
+        select.change(function() {
+            that.select($(this).val());
+            that.validate();
+        });
     };
 
     this.update_properties = function(elem) {
@@ -618,6 +725,20 @@ var SpiffFormDropdownList = function() {
         this.update();
     };
 
+    this.validate = function() {
+        if (this._required && typeof this._value === undefined) {
+            this.set_error('This field is required.');
+            return false;
+        }
+        var selected_text = this._items[this._value];
+        if (this._required && selected_text === '') {
+            this.set_error('This field is required.');
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
+    };
+
     this.serialize = function(serializer) {
         return serializer.serialize_dropdownlist(this);
     };
@@ -708,8 +829,13 @@ var SpiffForm = function(div) {
     // Returns the inserted dom element.
     this.set_buttons = function(buttons) {
         var elem = this._div.find('.spiffform-buttons');
-        if (buttons == 'submit')
+        if (buttons == 'submit') {
             buttons = $('<input type="submit"/>');
+            buttons.click(function() {
+                that.validate();
+                that.trigger('submit');
+            });
+        }
         elem.empty();
         elem.append(buttons);
         return buttons;
@@ -733,7 +859,9 @@ var SpiffForm = function(div) {
                      '</div>' +
                      '</li>');
         elem.data('obj', obj);
-        elem.click(function(e) { return that.trigger('clicked', [e, obj]); });
+        elem.click(function(e) {
+            return that.trigger('clicked', [e, obj]);
+        });
         var div = elem.find('div');
         obj.attach(div);
         return elem;
@@ -836,6 +964,16 @@ var SpiffForm = function(div) {
                     that.remove(ui.item.data('obj'));
             }
         });
+    };
+
+    this.validate = function() {
+        var has_errors = false;
+        this._div.find('li.spiffform-canvas-item').each(function() {
+            var obj = $(this).data('obj');
+            if (!obj.validate())
+                has_errors = true;
+        });
+        return has_errors;
     };
 
     this.serialize = function(serializer) {
