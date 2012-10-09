@@ -51,6 +51,30 @@ var _SpiffFormObjectSerializer = function() {
         return obj;
     };
 
+    this.serialize_title = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.deserialize_title = function(data) {
+        return this.deserialize_element(new SpiffFormTitle(), data);
+    };
+
+    this.serialize_subtitle = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.deserialize_subtitle = function(data) {
+        return this.deserialize_element(new SpiffFormSubtitle(), data);
+    };
+
+    this.serialize_separator = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.deserialize_separator = function(data) {
+        return this.deserialize_element(new SpiffFormSeparator(), data);
+    };
+
     this.serialize_entryfield = function(obj) {
         return this.serialize_element(obj);
     };
@@ -111,7 +135,7 @@ var _SpiffFormObjectSerializer = function() {
     this.serialize_form = function(form) {
         var that = this;
         var list = [];
-        form._div.find('li.spiffform-canvas-item').each(function() {
+        form._div.find('.spiffform-item:not(.spiffform-item-fixed)').each(function() {
             var obj = $(this).data('obj');
             list.push(obj.serialize(that));
         });
@@ -216,7 +240,7 @@ var SpiffFormElement = function() {
     };
 
     this.set_error = function(text) {
-        var span = this._div.find('.spiffform-canvas-item-error');
+        var span = this._div.find('.spiffform-item-error');
         if (typeof text === 'undefined')
             span.slideUp('fast');
         else {
@@ -251,6 +275,164 @@ var SpiffFormElement = function() {
 SpiffFormElement.prototype = new SpiffFormTrackable();
 
 // -----------------------
+// Title
+// -----------------------
+var SpiffFormTitle = function() {
+    this._name = 'Title';
+    this._value = 'Untitled';
+    var that = this;
+
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        if (that._div.children().length) {
+            that._div.find('input').val(that._value);
+            return;
+        }
+        that._div.append('<input type="text" disabled="disabled"/>');
+        that._div.append('<span class="spiffform-item-error"></span>');
+        var input = that._div.find('input');
+        input.val(that._value);
+        input.bind('keyup mouseup change', function() {
+            that._value = $(this).val();
+            that.validate();
+        });
+    };
+
+    this.update_properties = function(elem) {
+        elem.append('<label>Text: <input type="text"/></label>');
+        var input = elem.find('input');
+        input.val(this._value);
+        input.bind('keyup mouseup change', function() {
+            that._value = $(this).val();
+            that.update();
+        });
+    };
+
+    this.set_text = function(text) {
+        this._value = text;
+        this.update();
+    };
+
+    this.get_text = function(required) {
+        return this._value;
+    };
+
+    this.validate = function() {
+        if (this._required && this._value === '') {
+            this.set_error('This field is required.');
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_title(this);
+    };
+
+    this.deserialize = function(serializer, data) {
+        return serializer.deserialize_title(this, data);
+    };
+};
+
+SpiffFormTitle.prototype = new SpiffFormElement();
+SpiffFormTitle.prototype.handle = 'title';
+spiffform_elements[SpiffFormTitle.prototype.handle] = SpiffFormTitle;
+
+// -----------------------
+// Subtitle
+// -----------------------
+var SpiffFormSubtitle = function() {
+    this._name = 'Subtitle';
+    this._value = 'Please fill out the form';
+    var that = this;
+
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<input type="text" disabled="disabled"/>');
+        that._div.append('<span class="spiffform-item-error"></span>');
+        var input = that._div.find('input');
+        input.val(that._value);
+        input.bind('keyup mouseup change', function() {
+            that._value = $(this).val();
+            that.validate();
+        });
+    };
+
+    this.update_properties = function(elem) {
+        elem.append('<label>Text: <input type="text"/></label>');
+        var input = elem.find('input');
+        input.val(this._value);
+        input.bind('keyup mouseup change', function() {
+            that._value = $(this).val();
+            that.update();
+        });
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_subtitle(this);
+    };
+
+    this.deserialize = function(serializer, data) {
+        return serializer.deserialize_subtitle(this, data);
+    };
+};
+
+SpiffFormSubtitle.prototype = new SpiffFormTitle();
+SpiffFormSubtitle.prototype.handle = 'subtitle';
+spiffform_elements[SpiffFormSubtitle.prototype.handle] = SpiffFormSubtitle;
+
+// -----------------------
+// Horizontal Separator
+// -----------------------
+var SpiffFormSeparator = function() {
+    this._name = 'Separator';
+    this._value = 'Please fill out the form';
+    var that = this;
+
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<hr/>');
+    };
+
+    this.update_properties = function(elem) {
+        elem.append('Separator has no properties');
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_separator(this);
+    };
+
+    this.deserialize = function(serializer, data) {
+        return serializer.deserialize_separator(this, data);
+    };
+};
+
+SpiffFormSeparator.prototype = new SpiffFormElement();
+SpiffFormSeparator.prototype.handle = 'separator';
+spiffform_elements[SpiffFormSeparator.prototype.handle] = SpiffFormSeparator;
+
+// -----------------------
 // Entry Box
 // -----------------------
 var SpiffFormEntryField = function() {
@@ -268,7 +450,7 @@ var SpiffFormEntryField = function() {
             return;
         that._div.empty();
         that._div.append('<label>' + that._get_label_html() + '<input type="text"/></label>');
-        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        that._div.append('<span class="spiffform-item-error"></span>');
         var input = that._div.find('input:text');
         input.val(that._value);
         input.bind('keyup mouseup change', function() {
@@ -283,9 +465,7 @@ var SpiffFormEntryField = function() {
 
         // Default value.
         var that = this;
-        elem.append('<div>' +
-                    '<label>Default: <input type="text" name="default"/></label>' +
-                    '</div>');
+        elem.append('<label>Default: <input type="text" name="default"/></label>');
         var input = elem.find('input[name=default]');
         input.val(this._value);
         input.bind('keyup mouseup change', function() {
@@ -342,7 +522,7 @@ var SpiffFormTextArea = function() {
             return;
         that._div.empty();
         that._div.append('<label>'+ that._get_label_html() + '<textarea></textarea></label>');
-        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        that._div.append('<span class="spiffform-item-error"></span>');
         var textarea = that._div.find('textarea');
         textarea.val(that._value);
         textarea.bind('keyup mouseup change', function() {
@@ -451,7 +631,7 @@ var SpiffFormCheckbox = function() {
             return;
         that._div.empty();
         that._div.append('<label><input type="checkbox"/>' + that._get_label_html(false) + '</label>');
-        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        that._div.append('<span class="spiffform-item-error"></span>');
         var checkbox = that._div.find('input');
         checkbox.prop('checked', that._value);
         checkbox.click(function() {
@@ -524,7 +704,7 @@ var SpiffFormDatePicker = function() {
             return;
         that._div.empty();
         that._div.append('<label>'+ that._get_label_html() + '<input type="text"/></label>');
-        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        that._div.append('<span class="spiffform-item-error"></span>');
 
         // A datepicker requires a unique id, else it will expose some weird
         // behavior as soon as multiple datepickers are used.
@@ -622,7 +802,7 @@ var SpiffFormDropdownList = function() {
         that._div.empty();
         that._div.append('<label>'+ that._get_label_html() + '</label>');
         that._div.find('label').append(that._get_select_elem());
-        that._div.append('<span class="spiffform-canvas-item-error"></span>');
+        that._div.append('<span class="spiffform-item-error"></span>');
         var select = that._div.find('select');
         select.change(function() {
             that.select($(this).val());
@@ -776,39 +956,45 @@ var SpiffForm = function(div) {
 
     // Returns the name/title of the form.
     this.get_title = function() {
-        return this._div.find('.spiffform-title input').val();
+        return this._div.find('.spiffform-item-title').data('obj').get_text();
     };
 
     // Change the name/title of the form.
     this.set_title = function(title) {
-        this._div.find('.spiffform-title input').val(title);
+        this._div.find('.spiffform-item-title').data('obj').set_text(title);
     };
 
     // Returns the subtitle of the form.
     this.get_subtitle = function() {
-        return this._div.find('.spiffform-subtitle input').val();
+        return this._div.find('.spiffform-item-subtitle').data('obj').get_text();
     };
 
     // Change the subtitle of the form.
     this.set_subtitle = function(subtitle) {
-        this._div.find('.spiffform-subtitle input').val(subtitle);
+        this._div.find('.spiffform-item-subtitle').data('obj').set_text(subtitle);
     };
 
     // Change the hint shown underneath of the form. Accepts either a dom
     // element, plain text, or the following keywords:
-    //   drag, delete
+    //   drag, delete, validationerror
     this.set_hint = function(hint) {
-        var elem = this._div.find('.spiffform-canvas-hint');
+        var elem = this._div.find('.spiffform-hint');
         var span = elem.find('span');
-        elem.removeClass('spiffform-canvas-hint-arrow-right');
-        elem.removeClass('spiffform-canvas-hint-delete');
+        elem.removeClass('spiffform-hint-arrow-right');
+        elem.removeClass('spiffform-hint-delete');
+        elem.removeClass('spiffform-hint-error');
         if (hint == 'drag') {
             span.text('Drag form elements from the right');
-            elem.addClass('spiffform-canvas-hint-arrow-right');
+            elem.addClass('spiffform-hint-arrow-right');
         }
         else if (hint == 'delete') {
             span.text('Drop here to remove');
-            elem.addClass('spiffform-canvas-hint-delete');
+            elem.addClass('spiffform-hint-delete');
+        }
+        else if (hint === 'validationerror') {
+            span.text('Please correct the errors above.');
+            elem.addClass('spiffform-hint-error');
+            return;
         }
         else if (hint === '') {
             elem.hide();
@@ -843,27 +1029,23 @@ var SpiffForm = function(div) {
 
     // Unselect all items.
     this.unselect = function() {
-        that._div.find('*').removeClass('spiffform-canvas-item-selected');
+        that._div.find('*').removeClass('spiffform-item-selected');
     };
 
     // Select the given item. Expects an SpiffFormElement.
     this.select = function(obj) {
         that.unselect();
-        obj._div.parent().addClass('spiffform-canvas-item-selected');
+        obj._div.addClass('spiffform-item-selected');
     };
 
     this._attach = function(obj) {
         var handle = obj.get_handle();
-        var elem = $('<li class="spiffform-canvas-item">' +
-                     '<div class="spiffform-ui-element spiffform-ui-' + handle + '">' +
-                     '</div>' +
-                     '</li>');
+        var elem = $('<li class="spiffform-item spiffform-item-' + handle + '"></li>');
         elem.data('obj', obj);
         elem.click(function(e) {
             return that.trigger('clicked', [e, obj]);
         });
-        var div = elem.find('div');
-        obj.attach(div);
+        obj.attach(elem);
         return elem;
     };
 
@@ -872,13 +1054,13 @@ var SpiffForm = function(div) {
         if (typeof obj === 'undefined')
             throw new Error('object is required argument');
         var elem = this._attach(obj);
-        this._div.find('.spiffform-canvas-elements').append(elem);
+        this._div.find('.spiffform-elements').append(elem);
         return obj;
     };
 
     // Removes the given element from the form. Expects a SpiffFormElement.
     this.remove = function(obj) {
-        obj._div.parent().remove();
+        obj._div.remove();
         this.unselect();
     };
 
@@ -897,15 +1079,15 @@ var SpiffForm = function(div) {
         var elem = this._attach(obj);
         if (!target.is('li'))
             target = target.parents('li').first();
-        if (target.is('li.spiffform-canvas-item'))
+        if (target.is('li.spiffform-item'))
             elem.insertBefore(target);
         else if (target.is('li')) {
             // Dropped on the form header.
-            elem.insertAfter(this._div.find('li:not(.spiffform-canvas-item):last'));
+            elem.insertAfter(this._div.find('li:not(.spiffform-item-fixed):last'));
         }
         else {
             // Dropped on the form, but not on the element list.
-            this._div.find('.spiffform-canvas-elements').append(elem);
+            this._div.find('.spiffform-elements').append(elem);
         }
     };
 
@@ -922,8 +1104,8 @@ var SpiffForm = function(div) {
         this.set_hint('drag');
         this.set_buttons($(''));
         this._div.addClass('spiffform-editor');
-        this._div.find('.spiffform-title input').removeAttr("disabled");
-        this._div.find('.spiffform-subtitle input').removeAttr("disabled");
+        this._div.find('.spiffform-item-title input').removeAttr("disabled");
+        this._div.find('.spiffform-item-subtitle input').removeAttr("disabled");
 
         // Initialize click events on the dom.
         that._div.click(function() {
@@ -937,10 +1119,10 @@ var SpiffForm = function(div) {
         });
 
         // Make form sortable.
-        that._div.find('.spiffform-canvas-elements').sortable({
+        that._div.find('.spiffform-elements').sortable({
             cancel: ':input:not([type=button])',
-            items: 'li.spiffform-canvas-item',
-            placeholder: 'spiffform-canvas-placeholder',
+            items: 'li.spiffform-item:not(.spiffform-item-fixed)',
+            placeholder: 'spiffform-placeholder',
             distance: 3,
             axis: 'y',
             containment: this._div,
@@ -968,11 +1150,13 @@ var SpiffForm = function(div) {
 
     this.validate = function() {
         var has_errors = false;
-        this._div.find('li.spiffform-canvas-item').each(function() {
+        this._div.find('li.spiffform-item').each(function() {
             var obj = $(this).data('obj');
             if (!obj.validate())
                 has_errors = true;
         });
+        if (has_errors)
+            that.set_hint('validationerror');
         return has_errors;
     };
 
@@ -981,7 +1165,7 @@ var SpiffForm = function(div) {
     };
 
     this.deserialize = function(serializer, data) {
-        this._div.find('li.spiffform-canvas-item').each(function() {
+        this._div.find('.spiffform-item:not(.spiffform-item-fixed)').each(function() {
             var obj = $(this).data('obj');
             that.remove(obj);
         });
@@ -989,24 +1173,16 @@ var SpiffForm = function(div) {
     };
 
     // Create the dom for the form.
-    this._div.append('<div class="spiffform-canvas">' +
-                     '<ul class="spiffform-canvas-elements">' +
-                     '<li class="spiffform-title">' +
-                       '<input type="text"/>' +
-                     '</li>' +
-                     '<li class="spiffform-subtitle">' +
-                       '<input type="text"/>' +
-                     '</li>' +
-                     '<li><hr/></li>' +
-                     '</ul>' +
-                     '<div class="spiffform-canvas-hint"><span></span></div>' +
-                     '<div class="spiffform-buttons"></div>' +
-                     '</div>');
+    this._div.append('<ul class="spiffform-elements"></ul>' +
+                     '<div class="spiffform-hint"><span></span></div>' +
+                     '<div class="spiffform-buttons"></div>');
 
-    this._div.find('.spiffform-title input').attr("disabled", "disabled");
-    this._div.find('.spiffform-subtitle input').attr("disabled", "disabled");
-    this.set_title('Untitled');
-    this.set_subtitle('Please fill out the form.');
+    var title = this.append(new SpiffFormTitle());
+    title._div.addClass('spiffform-item-fixed');
+    var subtitle = this.append(new SpiffFormSubtitle());
+    subtitle._div.addClass('spiffform-item-fixed');
+    var separator = this.append(new SpiffFormSeparator());
+    separator._div.addClass('spiffform-item-fixed');
     this.set_hint('');
     this.set_buttons('submit');
 };

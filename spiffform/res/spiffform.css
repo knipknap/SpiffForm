@@ -6,89 +6,43 @@ color: #000;
 width: 680px;
 margin: 0 auto;
 padding: 10px 20px;
-}
-
-.spiffform-canvas {
-margin: 0;
-padding: 0;
-}
-
-.spiffform-title input,
-.spiffform-subtitle input {
-background: #f0f2f8;
-border: 0;
-margin: .2ex auto;
-padding-left: 4px;
-width: 670px;
-}
-
-.spiffform-title input:enabled:hover,
-.spiffform-subtitle input:enabled:hover {
-background: #fff;
-}
-
-.spiffform-title input {
-font-size: 1.4em;
-color: #700;
-}
-
-.spiffform-subtitle input {
-font-size: 1.05em;
-font-weight: normal;
-color: #500;
-margin-bottom: 5px;
-}
-
-.spiffform-canvas {
-margin-top: 4px;
 text-align: center;
 }
 
-.spiffform-canvas hr {
-clear: both;
-border: 0;
-height: 1px;
-background: #bbb;
-}
-
-.spiffform-canvas-elements {
+.spiffform-elements {
 list-style-type: none;
 margin: 0 auto;
-padding-left: 10px;
-padding-bottom: 10px;
+padding: 4px 0 10px 10px;
 }
 
-.spiffform-canvas-placeholder {
+.spiffform-placeholder {
 border: 1px dashed #fd5;
 background: #ffd;
 }
 
-.spiffform-canvas-elements li {
+.spiffform-item {
 padding-left: -10px;
 margin-left: -10px;
-}
-
-.spiffform-canvas-elements li.spiffform-canvas-item {
 background: #f0f2f8;
 border: 1px solid #f0f2f8;
 }
 
-.spiffform-editor li.spiffform-canvas-item:hover {
+.spiffform-editor .spiffform-item:hover {
 background: #fffad7;
 border: 1px dashed #fe1;
 }
 
-.spiffform-editor li.spiffform-canvas-item-selected {
+.spiffform-editor .spiffform-item-selected {
 background: #ffef78;
 border: 1px dashed #b69c00;
 }
 
-.spiffform-editor li.spiffform-canvas-item-selected:hover {
+.spiffform-editor .spiffform-item-selected:hover {
 background: #fffad7;
 border: 1px dashed #fa1;
 }
 
-.spiffform-canvas-elements label {
+.spiffform-item label {
 display: block;
 clear: both;
 text-align: left;
@@ -96,63 +50,84 @@ margin: 3px;
 margin-top: 8px;
 }
 
-.spiffform-canvas-item input,
-.spiffform-canvas-item select,
-.spiffform-canvas-item textarea {
-display: block;
-margin: 0 auto;
-width: 670px;
+.spiffform-required {
+color: #f00;
 }
 
-.spiffform-canvas-item input,
-.spiffform-canvas-item select,
-.spiffform-canvas-item textarea {
-border: 1px solid #aaa;
-}
-
-.spiffform-canvas-item input,
-.spiffform-canvas-item textarea {
-padding: 3px;
-width: 664px;
-}
-
-.spiffform-canvas-item textarea {
-height: 140px;
-}
-
-.spiffform-canvas-item-error {
+.spiffform-item-error {
 display: block;
 color: red;
 text-align: left;
 padding-left: 5px;
 }
 
-.spiffform-canvas-elements .spiffform-ui-checkbox label {
-text-align: left;
+.spiffform-item-title input,
+.spiffform-item-subtitle input {
+background: #f0f2f8;
+border: 0;
+margin: 0 auto;
 width: 670px;
 }
 
-.spiffform-canvas-elements .spiffform-ui-checkbox input {
-display: inline;
-width: 1.2em;
+.spiffform-item-title input:enabled:hover,
+.spiffform-item-subtitle input:enabled:hover {
+background: #fff;
 }
 
-.spiffform-canvas-elements .spiffform-ui-button {
+.spiffform-item-title input {
+font-size: 1.4em;
+color: #700;
+}
+
+.spiffform-item-subtitle input {
+font-size: 1.05em;
+font-weight: normal;
+color: #500;
+}
+
+.spiffform-item-separator hr {
+border: 0;
+height: 1px;
+background: #bbb;
+}
+
+.spiffform-item-entryfield input,
+.spiffform-item-datepicker input,
+.spiffform-item-dropdownlist select,
+.spiffform-item-textarea textarea {
+display: block;
+margin: 0 auto;
+width: 670px;
+border: 1px solid #aaa;
+}
+
+.spiffform-item-entryfield input,
+.spiffform-item-datepicker input,
+.spiffform-item-textarea textarea {
+padding: 3px;
+width: 664px;
+}
+
+.spiffform-item-textarea textarea {
+height: 140px;
+}
+
+.spiffform-item-checkbox input {
+margin-right: .8ex;
+}
+
+.spiffform-item-button {
 text-align: right;
 margin: .5em 0;
 }
 
-.spiffform-canvas-elements .spiffform-ui-button input {
+.spiffform-item-button input {
 display: inline;
 width: auto;
 padding: .3em 1.3em;
 }
 
-.spiffform-required {
-color: #f00;
-}
-
-.spiffform-canvas-hint {
+.spiffform-hint {
 font-family: serif;
 font-size: 1.3em;
 font-weight: normal;
@@ -160,22 +135,28 @@ color: #53697f;
 border: 1px dashed #f0f2f8;
 }
 
-.spiffform-canvas-hint span {
+.spiffform-hint span {
 margin: 3em auto;
 display: inline-block;
 }
 
-.spiffform-canvas-hint-arrow-right span {
+.spiffform-hint-arrow-right span {
 padding-right: 35px;
 background-image: url('arrow-right.png');
 background-repeat: no-repeat;
 background-position: top right;
 }
 
-.spiffform-canvas-hint-delete {
+.spiffform-hint-delete {
 background: #ffebeb;
 border: 1px dashed #ffc5c5;
 padding: 0 3em;
+}
+
+.spiffform-hint-error {
+background: #ffebeb;
+border: 1px solid #ffc5c5;
+padding: 1em;
 }
 
 .spiffform-panel {

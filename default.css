@@ -99,3 +99,7 @@ background-image: url('spiffform/res/calendar.png');
 #ui-combo {
 background-image: url('spiffform/res/combo.png');
 }
+
+#ui-separator {
+background-image: url('spiffform/res/separator.png');
+}
