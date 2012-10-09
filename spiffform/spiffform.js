@@ -15,6 +15,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ======================================================================
 // Utilities.
 // ======================================================================
+// Object.getPrototypeOf is broken in IE :-(. Rough attempt of a workaround:
+if (!Object.getPrototypeOf) {
+    if (typeof this.__proto__ === "object") {
+		Object.getPrototypeOf = function (obj) {
+			return obj.__proto__;
+		};
+	} else {
+		Object.getPrototypeOf = function (obj) {
+			var constructor = obj.constructor,
+			oldConstructor;
+			if (Object.prototype.hasOwnProperty.call(obj, "constructor")) {
+				oldConstructor = constructor;
+				if (!(delete obj.constructor)) // reset constructor
+					return null; // can't delete obj.constructor, return null
+				constructor = obj.constructor; // get real constructor
+				obj.constructor = oldConstructor; // restore constructor
+			}
+			return constructor ? constructor.prototype : null; // needed for IE
+		};
+	}
+}
+
+// Base class for adding a signal/event mechanism.
 var SpiffFormTrackable = function() {
     this._listeners = {
     };
@@ -38,7 +61,7 @@ var SpiffFormTrackable = function() {
 
 var _SpiffFormObjectSerializer = function() {
     this.serialize_element = function(obj) {
-        return {'handle': obj.get_handle(),
+        return {'handle': obj._handle,
                 'label': obj._label,
                 'value': obj._value,
                 'required': obj._required};
@@ -183,7 +206,7 @@ var SpiffFormElement = function() {
     this._id = (new Date()).getTime();
 
     this.get_handle = function() {
-        return Object.getPrototypeOf(this).handle;
+        return undefined;
     };
 
     this._get_required_mark_html = function() {
@@ -282,6 +305,10 @@ var SpiffFormTitle = function() {
     this._value = 'Untitled';
     var that = this;
 
+    this.get_handle = function() {
+        return 'title';
+    };
+
     this.attach = function(div) {
         this._div = div;
         this.update();
@@ -342,7 +369,6 @@ var SpiffFormTitle = function() {
 };
 
 SpiffFormTitle.prototype = new SpiffFormElement();
-SpiffFormTitle.prototype.handle = 'title';
 spiffform_elements[SpiffFormTitle.prototype.handle] = SpiffFormTitle;
 
 // -----------------------
@@ -352,6 +378,10 @@ var SpiffFormSubtitle = function() {
     this._name = 'Subtitle';
     this._value = 'Please fill out the form';
     var that = this;
+
+    this.get_handle = function() {
+        return 'subtitle';
+    };
 
     this.attach = function(div) {
         this._div = div;
@@ -392,7 +422,6 @@ var SpiffFormSubtitle = function() {
 };
 
 SpiffFormSubtitle.prototype = new SpiffFormTitle();
-SpiffFormSubtitle.prototype.handle = 'subtitle';
 spiffform_elements[SpiffFormSubtitle.prototype.handle] = SpiffFormSubtitle;
 
 // -----------------------
@@ -402,6 +431,10 @@ var SpiffFormSeparator = function() {
     this._name = 'Separator';
     this._value = 'Please fill out the form';
     var that = this;
+
+    this.get_handle = function() {
+        return 'separator';
+    };
 
     this.attach = function(div) {
         this._div = div;
@@ -429,7 +462,6 @@ var SpiffFormSeparator = function() {
 };
 
 SpiffFormSeparator.prototype = new SpiffFormElement();
-SpiffFormSeparator.prototype.handle = 'separator';
 spiffform_elements[SpiffFormSeparator.prototype.handle] = SpiffFormSeparator;
 
 // -----------------------
@@ -439,6 +471,10 @@ var SpiffFormEntryField = function() {
     this._name = 'Entry Field';
     this._value = '';
     var that = this;
+
+    this.get_handle = function() {
+        return 'entryfield';
+    };
 
     this.attach = function(div) {
         this._div = div;
@@ -512,6 +548,10 @@ var SpiffFormTextArea = function() {
     this._value = '';
     var that = this;
 
+    this.get_handle = function() {
+        return 'textarea';
+    };
+
     this.attach = function(div) {
         this._div = div;
         this.update();
@@ -573,7 +613,6 @@ var SpiffFormTextArea = function() {
 };
 
 SpiffFormTextArea.prototype = new SpiffFormElement();
-SpiffFormTextArea.prototype.handle = 'textarea';
 spiffform_elements[SpiffFormTextArea.prototype.handle] = SpiffFormTextArea;
 
 // -----------------------
@@ -582,6 +621,10 @@ spiffform_elements[SpiffFormTextArea.prototype.handle] = SpiffFormTextArea;
 var SpiffFormButton = function() {
     this._name = 'Button';
     var that = this;
+
+    this.get_handle = function() {
+        return 'button';
+    };
 
     this.attach = function(div) {
         this._div = div;
@@ -609,7 +652,6 @@ var SpiffFormButton = function() {
 };
 
 SpiffFormButton.prototype = new SpiffFormElement();
-SpiffFormButton.prototype.handle = 'button';
 spiffform_elements[SpiffFormButton.prototype.handle] = SpiffFormButton;
 
 // -----------------------
@@ -620,6 +662,10 @@ var SpiffFormCheckbox = function() {
     this._name = 'Checkbox';
     this._value = false;
     var that = this;
+
+    this.get_handle = function() {
+        return 'checkbox';
+    };
 
     this.attach = function(div) {
         this._div = div;
@@ -682,7 +728,6 @@ var SpiffFormCheckbox = function() {
 };
 
 SpiffFormCheckbox.prototype = new SpiffFormElement();
-SpiffFormCheckbox.prototype.handle = 'checkbox';
 spiffform_elements[SpiffFormCheckbox.prototype.handle] = SpiffFormCheckbox;
 
 // -----------------------
@@ -693,6 +738,10 @@ var SpiffFormDatePicker = function() {
     this._name = 'Date Picker';
     this._label = 'Date';
     var that = this;
+
+    this.get_handle = function() {
+        return 'datepicker';
+    };
 
     this.attach = function(div) {
         this._div = div;
@@ -771,7 +820,6 @@ var SpiffFormDatePicker = function() {
 };
 
 SpiffFormDatePicker.prototype = new SpiffFormElement();
-SpiffFormDatePicker.prototype.handle = 'datepicker';
 spiffform_elements[SpiffFormDatePicker.prototype.handle] = SpiffFormDatePicker;
 
 // -----------------------
@@ -782,6 +830,10 @@ var SpiffFormDropdownList = function() {
     this._label = 'Please choose';
     this._items = [];
     var that = this;
+
+    this.get_handle = function() {
+        return 'dropdownlist';
+    };
 
     this.attach = function(div) {
         this._div = div;
@@ -929,7 +981,6 @@ var SpiffFormDropdownList = function() {
 };
 
 SpiffFormDropdownList.prototype = new SpiffFormElement();
-SpiffFormDropdownList.prototype.handle = 'dropdownlist';
 spiffform_elements[SpiffFormDropdownList.prototype.handle] = SpiffFormDropdownList;
 
 // ======================================================================
@@ -1072,19 +1123,24 @@ var SpiffForm = function(div) {
             throw new Error('object is required argument');
 
         // Make sure that the element was dropped within this form.
-        var target = $(event.toElement);
-        if (!target.parents().andSelf().filter('div.spiffform').length)
+        var pointing_at = event.toElement;
+        if (!pointing_at)
+            pointing_at = event.relatedTarget;
+        if (!pointing_at)
+            pointing_at = document.elementFromPoint(event.pageX, event.pageY);
+        var target = $(pointing_at);
+        if (!target.parents().andSelf().filter('.spiffform').length)
             return;
 
         // Insert at the appropriate position, or append if this is the first item.
         var elem = this._attach(obj);
         if (!target.is('li'))
             target = target.parents('li').first();
-        if (target.is('li.spiffform-item'))
+        if (target.is('.spiffform-item:not(.spiffform-item-fixed)'))
             elem.insertBefore(target);
-        else if (target.is('li')) {
+        else if (target.is('.spiffform-item')) {
             // Dropped on the form header.
-            elem.insertAfter(this._div.find('li:not(.spiffform-item-fixed):last'));
+            elem.insertAfter(this._div.find('.spiffform-item-fixed:last'));
         }
         else {
             // Dropped on the form, but not on the element list.

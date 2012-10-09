@@ -212,11 +212,12 @@ height: 180px;
 .spiffform-panel-content ul {
 list-style-type: none;
 margin: 0 auto;
+padding: 4px 0 10px 0;
 }
 
 .spiffform-panel-content li {
-margin-left: -23px;
-text-align: left;
+text-align: right;
+margin-left: 18px;
 }
 
 .spiffform-panel-content ul input[type=text] {
