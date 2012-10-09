@@ -655,22 +655,22 @@ var SpiffForm = function(div) {
 
     // Returns the name/title of the form.
     this.get_title = function() {
-        return this._div.find('.spiffform-title').val();
+        return this._div.find('.spiffform-title input').val();
     };
 
     // Change the name/title of the form.
     this.set_title = function(title) {
-        this._div.find('.spiffform-title').val(title);
+        this._div.find('.spiffform-title input').val(title);
     };
 
     // Returns the subtitle of the form.
     this.get_subtitle = function() {
-        return this._div.find('.spiffform-subtitle').val();
+        return this._div.find('.spiffform-subtitle input').val();
     };
 
     // Change the subtitle of the form.
     this.set_subtitle = function(subtitle) {
-        this._div.find('.spiffform-subtitle').val(subtitle);
+        this._div.find('.spiffform-subtitle input').val(subtitle);
     };
 
     // Change the hint shown underneath of the form. Accepts either a dom
@@ -794,7 +794,8 @@ var SpiffForm = function(div) {
         this.set_hint('drag');
         this.set_buttons($(''));
         this._div.addClass('spiffform-editor');
-        this._div.find('input.spiffform-subtitle').removeAttr("disabled");
+        this._div.find('.spiffform-title input').removeAttr("disabled");
+        this._div.find('.spiffform-subtitle input').removeAttr("disabled");
 
         // Initialize click events on the dom.
         that._div.click(function() {
@@ -852,15 +853,20 @@ var SpiffForm = function(div) {
     // Create the dom for the form.
     this._div.append('<div class="spiffform-canvas">' +
                      '<ul class="spiffform-canvas-elements">' +
-                     '<li><input type="text" class="spiffform-title"/></li>' +
-                     '<li><input type="text" class="spiffform-subtitle"/></li>' +
+                     '<li class="spiffform-title">' +
+                       '<input type="text"/>' +
+                     '</li>' +
+                     '<li class="spiffform-subtitle">' +
+                       '<input type="text"/>' +
+                     '</li>' +
                      '<li><hr/></li>' +
                      '</ul>' +
                      '<div class="spiffform-canvas-hint"><span></span></div>' +
                      '<div class="spiffform-buttons"></div>' +
                      '</div>');
 
-    this._div.find('input.spiffform-subtitle').attr("disabled", "disabled");
+    this._div.find('.spiffform-title input').attr("disabled", "disabled");
+    this._div.find('.spiffform-subtitle input').attr("disabled", "disabled");
     this.set_title('Untitled');
     this.set_subtitle('Please fill out the form.');
     this.set_hint('');

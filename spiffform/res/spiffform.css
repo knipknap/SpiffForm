@@ -13,23 +13,30 @@ margin: 0;
 padding: 0;
 }
 
-.spiffform-title {
-font-size: 1.4em;
-color: #700;
-margin: 0 .2em .2em .2em;
-text-align: left;
+.spiffform-title input,
+.spiffform-subtitle input {
 background: #f0f2f8;
 border: 0;
+margin: .2ex auto;
+padding-left: 4px;
+width: 670px;
 }
 
-.spiffform-subtitle {
+.spiffform-title input:enabled:hover,
+.spiffform-subtitle input:enabled:hover {
+background: #fff;
+}
+
+.spiffform-title input {
+font-size: 1.4em;
+color: #700;
+}
+
+.spiffform-subtitle input {
 font-size: 1.05em;
 font-weight: normal;
-width: 680px;
 color: #500;
-background: #f0f2f8;
-margin: .2em auto;
-border: 0;
+margin-bottom: 5px;
 }
 
 .spiffform-canvas {
@@ -38,6 +45,7 @@ text-align: center;
 }
 
 .spiffform-canvas hr {
+clear: both;
 border: 0;
 height: 1px;
 background: #bbb;
@@ -88,9 +96,9 @@ margin: 3px;
 margin-top: 8px;
 }
 
-.spiffform-canvas-elements input,
-.spiffform-canvas-elements select,
-.spiffform-canvas-elements textarea {
+.spiffform-canvas-item input,
+.spiffform-canvas-item select,
+.spiffform-canvas-item textarea {
 display: block;
 margin: 0 auto;
 width: 670px;
