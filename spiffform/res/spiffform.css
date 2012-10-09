@@ -156,7 +156,12 @@ padding: 0 3em;
 .spiffform-hint-error {
 background: #ffebeb;
 border: 1px solid #ffc5c5;
-padding: 1em;
+padding: .8em;
+margin: .2em;
+}
+
+.spiffform-hint-error span {
+margin: 0;
 }
 
 .spiffform-panel {

@@ -994,6 +994,7 @@ var SpiffForm = function(div) {
         else if (hint === 'validationerror') {
             span.text('Please correct the errors above.');
             elem.addClass('spiffform-hint-error');
+            elem.slideDown().delay(2000).slideUp();
             return;
         }
         else if (hint === '') {
