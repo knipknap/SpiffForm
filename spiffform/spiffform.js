@@ -1169,9 +1169,27 @@ var SpiffForm = function(div) {
             that._panel.hide();
         });
         that.bind('clicked', function(e, obj) {
+            that._div.find(':focus').blur();
             that.select(obj);
             that._panel.show_properties(obj, obj._div);
             return false;
+        });
+
+        // Initialize keyboard events.
+        that._div.find('input,select,textarea').click(function() {
+            return false;
+        });
+        $(document).keydown(function(event) {
+            if ($('input,select,textarea').is(':focus'))
+                return;
+            if (event.which != 46)
+                return;
+            var selected = that._div.find('.spiffform-item-selected');
+            if (!selected.length)
+                return;
+            if (selected.is('.spiffform-item-fixed'))
+                return;
+            that.remove(selected.data('obj'));
         });
 
         // Make form sortable.
