@@ -66,6 +66,7 @@ $(document).ready(function() {
                 "stop": function(event, ui) {
                     var cls = spiffform_elements[$(this).attr('name')];
                     form.insert_at(event, new cls());
+                    this.select(obj);
                 }
             });
         });

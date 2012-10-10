@@ -1079,14 +1079,18 @@ var SpiffForm = function(div) {
     };
 
     // Unselect all items.
-    this.unselect = function() {
+    this.unselect = function(hide_panel) {
         that._div.find('*').removeClass('spiffform-item-selected');
+        if (hide_panel === true || typeof hide_panel === 'undefined')
+            that._panel.hide();
     };
 
     // Select the given item. Expects an SpiffFormElement.
     this.select = function(obj) {
-        that.unselect();
+        that.unselect(false);
         obj._div.addClass('spiffform-item-selected');
+        if (that._panel)
+            that._panel.show_properties(obj);
     };
 
     this._attach = function(obj) {
@@ -1166,12 +1170,10 @@ var SpiffForm = function(div) {
         // Initialize click events on the dom.
         that._div.click(function() {
             that.unselect();
-            that._panel.hide();
         });
         that.bind('clicked', function(e, obj) {
             that._div.find(':focus').blur();
             that.select(obj);
-            that._panel.show_properties(obj, obj._div);
             return false;
         });
 
@@ -1277,8 +1279,8 @@ var SpiffFormPanel = function(panel_div) {
         this._panel.slideUp(speed);
     };
 
-    // Show properties for the given item. Expects an li element.
-    this.show_properties = function(obj, elem) {
+    // Show properties for the given item.
+    this.show_properties = function(obj) {
         this._panel.empty();
         this._panel.append('<h3>' + obj._name + ' Properties</h3>' +
                            '<div class="spiffform-panel-content"></div>');
