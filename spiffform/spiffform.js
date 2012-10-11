@@ -264,7 +264,8 @@ var SpiffFormElement = function() {
 
     this.set_error = function(text) {
         var span = this._div.find('.spiffform-item-error');
-        if (typeof text === 'undefined')
+        if (span.parents('.spiffform-editor').length ||
+            typeof text === 'undefined')
             span.slideUp('fast');
         else {
             span.text(text);
@@ -1169,6 +1170,10 @@ var SpiffForm = function(div) {
         this._div.addClass('spiffform-editor');
         this._div.find('.spiffform-item-title input').removeAttr("disabled");
         this._div.find('.spiffform-item-subtitle input').removeAttr("disabled");
+        this._div.find('.spiffform-item').each(function() {
+            var obj = $(this).data('obj');
+            obj.set_error(); // Hide validation error messages.
+        });
 
         // Initialize click events on the dom.
         that._div.click(function() {
