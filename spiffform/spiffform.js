@@ -1097,10 +1097,12 @@ var SpiffForm = function(div) {
         var handle = obj.get_handle();
         var elem = $('<li class="spiffform-item spiffform-item-' + handle + '"></li>');
         elem.data('obj', obj);
+        obj.attach(elem);
         elem.click(function(e) {
+            if (!$(e.target).is('input,textarea,select'))
+                that._div.find(':focus').blur();
             return that.trigger('clicked', [e, obj]);
         });
-        obj.attach(elem);
         return elem;
     };
 
@@ -1149,6 +1151,7 @@ var SpiffForm = function(div) {
             // Dropped on the form, but not on the element list.
             this._div.find('.spiffform-elements').append(elem);
         }
+        return obj;
     };
 
     this.make_editable = function(panel) {
@@ -1172,15 +1175,11 @@ var SpiffForm = function(div) {
             that.unselect();
         });
         that.bind('clicked', function(e, obj) {
-            that._div.find(':focus').blur();
             that.select(obj);
             return false;
         });
 
         // Initialize keyboard events.
-        that._div.find('input,select,textarea').click(function() {
-            return false;
-        });
         $(document).keydown(function(event) {
             if ($('input,select,textarea').is(':focus'))
                 return;

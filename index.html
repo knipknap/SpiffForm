@@ -65,8 +65,8 @@ $(document).ready(function() {
                 "cursorAt": {'right': -5},
                 "stop": function(event, ui) {
                     var cls = spiffform_elements[$(this).attr('name')];
-                    form.insert_at(event, new cls());
-                    this.select(obj);
+                    var obj = form.insert_at(event, new cls());
+                    form.select(obj);
                 }
             });
         });
