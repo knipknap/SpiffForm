@@ -1184,18 +1184,45 @@ var SpiffForm = function(div) {
             return false;
         });
 
-        // Initialize keyboard events.
+        // Initialize keyboard events. (The delete and arrow keys send no
+        // keypress events in several browsers.)
         $(document).keydown(function(event) {
+            // Ignore the event if an input field is currently focused.
             if ($('input,select,textarea').is(':focus'))
                 return;
-            if (event.which != 46)
-                return;
+            console.log(event.which);
             var selected = that._div.find('.spiffform-item-selected');
-            if (!selected.length)
+
+            // Delete key.
+            if (event.which == 46 &&
+                selected.length &&
+                !selected.is('.spiffform-item-fixed')) {
+                that.remove(selected.data('obj'));
                 return;
-            if (selected.is('.spiffform-item-fixed'))
+            }
+
+            // Arrow down.
+            var select;
+            if (event.which == 40) {
+                if (selected.length)
+                    select = selected.next();
+                else
+                    select = that._div.find('.spiffform-item:first');
+                if(select.is('.spiffform-item'))
+                    that.select(select.data('obj'));
                 return;
-            that.remove(selected.data('obj'));
+            }
+
+            // Arrow up.
+            if (event.which == 38) {
+                if (selected.length)
+                    select = selected.prev();
+                else
+                    select = that._div.find('.spiffform-item:last');
+                if(select.is('.spiffform-item'))
+                    that.select(select.data('obj'));
+                return;
+            }
         });
 
         // Make form sortable.
