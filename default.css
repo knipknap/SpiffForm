@@ -34,21 +34,18 @@ float: right;
 width: 270px;
 }
 
-#make-editable,
-#serialize,
-#serialize-deserialize {
+#buttons {
 text-align: center;
 }
 
-#make-editable input,
-#serialize input,
-#serialize-deserialize input {
-padding: .5em;
-margin-bottom: 12px;
+#buttons label {
+display: block;
+font-size: 1.4em;
 }
 
-#make-editable input {
-font-size: 1.4em;
+#buttons input {
+padding: .5em;
+margin-bottom: 12px;
 }
 
 #sidebar-elements {

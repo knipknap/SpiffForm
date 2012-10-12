@@ -57,11 +57,20 @@ var SpiffFormTrackable = function() {
         else
             this._listeners[event_name] = [listener];
     };
+
+    this.unbind = function(event_name, listener) {
+        if (!(this._listeners[event_name] instanceof Array))
+            return;
+        this._listeners[event_name] = $.grep(this._listeners[event_name],
+                                             function(elem, index) {
+            return elem !== listener;
+        });
+    };
 };
 
 var _SpiffFormObjectSerializer = function() {
     this.serialize_element = function(obj) {
-        return {'handle': obj._handle,
+        return {'handle': obj.get_handle(),
                 'label': obj._label,
                 'value': obj._value,
                 'required': obj._required};
@@ -989,10 +998,27 @@ spiffform_elements.dropdownlist = SpiffFormDropdownList;
 var SpiffForm = function(div) {
     this._div = div;
     this._panel = undefined;
+    this._event_handlers = [];
     var that = this;
 
     if (this._div.length != 1)
         throw new Error('form selector needs to match exactly one element');
+
+    this._init = function() {
+        // Create the dom for the form.
+        this._div.append('<ul class="spiffform-elements"></ul>' +
+                         '<div class="spiffform-hint"><span></span></div>' +
+                         '<div class="spiffform-buttons"></div>');
+
+        var title = this.append(new SpiffFormTitle());
+        title._div.addClass('spiffform-item-fixed');
+        var subtitle = this.append(new SpiffFormSubtitle());
+        subtitle._div.addClass('spiffform-item-fixed');
+        var separator = this.append(new SpiffFormSeparator());
+        separator._div.addClass('spiffform-item-fixed');
+        this.set_hint('');
+        this.set_buttons('submit');
+    };
 
     // Returns True if the given (mouse pointer) position is within the given
     // distance of the editor.
@@ -1171,7 +1197,36 @@ var SpiffForm = function(div) {
             this._panel.hide();
     };
 
-    this.make_editable = function() {
+    this.make_editable = function(editable) {
+        // To leave edit mode, we
+        // - serialize the current form
+        // - remove all children of the form's div.
+        // - disconnect that div's signals
+        // - disconnect the SpiffForm signals that we connected when entering
+        //   edit mode.
+        // - Re-init the div (re-add standard children like the title and
+        //   the empty item list).
+        // - Restore the content by loading the serialized form.
+        if (editable === false) {
+            if (!this._div.is('.spiffform-editor'))
+                return;
+            if (this._panel)
+                this._panel.hide();
+            var data = that.serialize(SpiffFormJSONSerializer);
+            $.each(this._event_handlers, function(index, item) {
+                item[0].unbind(item[1], item[2]);
+            });
+            this._event_handlers = [];
+            that._div.empty();
+            that._div.removeClass('spiffform-editor');
+            that._init();
+            that.deserialize(SpiffFormJSONSerializer, data);
+            return;
+        }
+
+        // Make the form editable.
+        if (this._div.is('.spiffform-editor'))
+            return;
         if (this._panel)
             this._panel.hide();
 
@@ -1187,17 +1242,19 @@ var SpiffForm = function(div) {
         });
 
         // Initialize click events on the dom.
-        that._div.click(function() {
-            that.unselect();
-        });
-        that.bind('clicked', function(e, obj) {
+        var cb = function() { that.unselect(); };
+        that._div.click(cb);
+        that._event_handlers.push([that._div, 'click', cb]);
+        cb = function(e, obj) {
             that.select(obj);
             return false;
-        });
+        };
+        that.bind('clicked', cb);
+        that._event_handlers.push([that, 'clicked', cb]);
 
         // Initialize keyboard events. (The delete and arrow keys send no
         // keypress events in several browsers.)
-        $(document).keydown(function(event) {
+        cb = function(event) {
             // Ignore the event if an input field is currently focused.
             if ($('input,select,textarea').is(':focus'))
                 return;
@@ -1233,7 +1290,9 @@ var SpiffForm = function(div) {
                     that.select(select.data('obj'));
                 return;
             }
-        });
+        };
+        $(document).keydown(cb);
+        that._event_handlers.push([$(document), 'keydown', cb]);
 
         // Make form sortable.
         that._div.find('.spiffform-elements').sortable({
@@ -1289,19 +1348,7 @@ var SpiffForm = function(div) {
         return serializer.deserialize_form(this, data);
     };
 
-    // Create the dom for the form.
-    this._div.append('<ul class="spiffform-elements"></ul>' +
-                     '<div class="spiffform-hint"><span></span></div>' +
-                     '<div class="spiffform-buttons"></div>');
-
-    var title = this.append(new SpiffFormTitle());
-    title._div.addClass('spiffform-item-fixed');
-    var subtitle = this.append(new SpiffFormSubtitle());
-    subtitle._div.addClass('spiffform-item-fixed');
-    var separator = this.append(new SpiffFormSeparator());
-    separator._div.addClass('spiffform-item-fixed');
-    this.set_hint('');
-    this.set_buttons('submit');
+    this._init();
 };
 
 SpiffForm.prototype = new SpiffFormTrackable();

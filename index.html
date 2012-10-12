@@ -54,24 +54,27 @@ $(document).ready(function() {
     var checkbox = form.append(new SpiffFormCheckbox());
     checkbox.set_label('Please send more spam to my inbox');
 
-    $('#make-editable').click(function() {
-        $(this).slideToggle("slow");
-        $('#sidebar-elements').slideToggle("slow");
-        form.make_editable();
-
-        $(".ui-elements li").each(function() {
-            $(this).draggable({
-                "helper": function() {
-                    return $(this).clone();
-                },
-                "cursorAt": {'right': -5},
-                "stop": function(event, ui) {
-                    var cls = spiffform_elements[$(this).attr('name')];
-                    var obj = form.insert_at(event, new cls());
-                    form.select(obj);
-                }
-            });
+    $(".ui-elements li").each(function() {
+        $(this).draggable({
+            "helper": function() {
+                return $(this).clone();
+            },
+            "stop": function(event, ui) {
+                var cls = spiffform_elements[$(this).attr('name')];
+                var obj = form.insert_at(event, new cls());
+                form.select(obj);
+            }
         });
+    });
+    $('#editable').click(function() {
+        if ($(this).is(':checked')) {
+            $('#sidebar-elements').slideDown("slow");
+            form.make_editable();
+        }
+        else {
+            $('#sidebar-elements').slideUp("slow");
+            form.make_editable(false);
+        }
     });
     $('#serialize').click(function() {
         alert(form.serialize(SpiffFormJSONSerializer));
@@ -92,7 +95,6 @@ $(document).ready(function() {
   </div>
 
   <div id="sidebar">
-    <div id="make-editable"><input type="button" value="Make editable!"/></div>
     <div id="panel" class="spiffform-panel"></div>
 
     <div id="sidebar-elements">
@@ -116,8 +118,11 @@ $(document).ready(function() {
       </ul>
     </div>
 
-    <div id="serialize"><input type="button" value="Serialize"/></div>
-    <div id="serialize-deserialize"><input type="button" value="Serialize / Deserialize"/></div>
+    <div id="buttons">
+        <label><input type="checkbox" id="editable"/>Editable form</label>
+        <input type="button" id="serialize" value="Serialize"/>
+        <input type="button" id="serialize-deserialize" value="Serialize / Deserialize"/>
+    </div>
   </div>
 </div>
 
