@@ -1083,7 +1083,8 @@ var SpiffForm = function(div) {
     this.unselect = function(hide_panel) {
         that._div.find('*').removeClass('spiffform-item-selected');
         if (hide_panel === true || typeof hide_panel === 'undefined')
-            that._panel.hide();
+            if (that._panel)
+                that._panel.hide();
     };
 
     // Select the given item. Expects an SpiffFormElement.
@@ -1155,14 +1156,24 @@ var SpiffForm = function(div) {
         return obj;
     };
 
-    this.make_editable = function(panel) {
-        // Attach the panel.
+    // Attach a div that will show properties etc. when a form element
+    // is selected in edit mode.
+    this.attach_panel = function(panel) {
         if (typeof panel === 'undefined')
             throw new Error('panel argument is required');
         if (typeof this._panel !== 'undefined')
             throw new Error('form is already attached to another panel');
         this._panel = panel;
-        this._panel.hide();
+        var selected = that._div.find('.spiffform-item-selected');
+        if (selected.length)
+            this._panel.show_properties(selected.data('obj'));
+        else
+            this._panel.hide();
+    };
+
+    this.make_editable = function() {
+        if (this._panel)
+            this._panel.hide();
 
         // Some visual changes.
         this.set_hint('drag');
@@ -1190,7 +1201,6 @@ var SpiffForm = function(div) {
             // Ignore the event if an input field is currently focused.
             if ($('input,select,textarea').is(':focus'))
                 return;
-            console.log(event.which);
             var selected = that._div.find('.spiffform-item-selected');
 
             // Delete key.

@@ -30,10 +30,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script src="spiffform/spiffform.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    var panel = new SpiffFormPanel($('#panel'));
     var form = new SpiffForm($('#form'));
     form.set_title('Feedback Form Demo');
     form.set_subtitle('Let us know what you think!');
+
+    var panel = new SpiffFormPanel($('#panel'));
+    form.attach_panel(panel);
 
     var choose = form.append(new SpiffFormDropdownList());
     choose.set_label('Complaint type');
@@ -55,7 +57,7 @@ $(document).ready(function() {
     $('#make-editable').click(function() {
         $(this).slideToggle("slow");
         $('#sidebar-elements').slideToggle("slow");
-        form.make_editable(panel);
+        form.make_editable();
 
         $(".ui-elements li").each(function() {
             $(this).draggable({
