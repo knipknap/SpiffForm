@@ -1003,6 +1003,7 @@ var SpiffForm = function(div) {
 
     if (this._div.length != 1)
         throw new Error('form selector needs to match exactly one element');
+    this._div.addClass('spiffform');
 
     this._init = function() {
         // Create the dom for the form.
