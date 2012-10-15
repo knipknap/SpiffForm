@@ -59,10 +59,15 @@ $(document).ready(function() {
             "helper": function() {
                 return $(this).clone();
             },
+            // "cursorAt" is important: make sure that the cursor is beneath
+            // (=not on top of) the dragged element, else "form.insert_at()"
+            // might not find the right target position for the new element.
+            "cursorAt": {'right': -5},
             "stop": function(event, ui) {
                 var cls = spiffform_elements[$(this).attr('name')];
                 var obj = form.insert_at(event, new cls());
-                form.select(obj);
+                if (obj)
+                    form.select(obj);
             }
         });
     });
