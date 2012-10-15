@@ -1,23 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<!--
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
 
 <head>
-  <title>SpiffForm Demo</title>
+  <title>Form Editor - SpiffForm Demo</title>
   <meta http-equiv="content-type" content="text/html;charset=utf-8" />
   <link rel="stylesheet" href="spiffform/res/spiffform.css" />
   <link rel="stylesheet" href="default.css" />
@@ -28,31 +14,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
 <script src="spiffform/spiffform.js" type="text/javascript"></script>
+<script src="form.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    var form = new SpiffForm($('#form'));
-    form.set_title('Feedback Form Demo');
-    form.set_subtitle('Let us know what you think!');
-
+    var form = attach_form($('#form'));
     var panel = new SpiffFormPanel($('#panel'));
     form.attach_panel(panel);
+    form.make_editable();
 
-    var choose = form.append(new SpiffFormDropdownList());
-    choose.set_label('Complaint type');
-    choose.add_option('');
-    choose.add_option('Customer service');
-    choose.select(1);
+    // select a form item to make the preferences visible.
+    form.select($('#form').find('.spiffform-item:nth(3)').data('obj'));
 
-    var entry = form.append(new SpiffFormEntryField());
-    entry.set_label('Complaint summary');
-    entry.set_text('Stop sending me emails');
-
-    var textbox = form.append(new SpiffFormTextArea());
-    textbox.set_label('Irrelevant text');
-    textbox.set_text('For the love of Jebus');
-
-    var checkbox = form.append(new SpiffFormCheckbox());
-    checkbox.set_label('Please send more spam to my inbox');
+    $('#sidebar-elements').slideDown("slow");
 
     $(".ui-elements li").each(function() {
         $(this).draggable({
@@ -71,6 +44,7 @@ $(document).ready(function() {
             }
         });
     });
+
     $('#editable').click(function() {
         if ($(this).is(':checked')) {
             $('#sidebar-elements').slideDown("slow");
@@ -81,9 +55,11 @@ $(document).ready(function() {
             form.make_editable(false);
         }
     });
+
     $('#serialize').click(function() {
         alert(form.serialize(SpiffFormJSONSerializer));
     });
+
     $('#serialize-deserialize').click(function() {
         form.deserialize(SpiffFormJSONSerializer, form.serialize(SpiffFormJSONSerializer));
     });
@@ -92,7 +68,7 @@ $(document).ready(function() {
 
 <body>
 
-<div id="header"><h1>SpiffForm Demo</h1></div>
+<div id="header"><h1>Form Editor - SpiffForm Demo</h1></div>
 <div id="wrap">
   <div id="center">
     <div id="form">
@@ -124,7 +100,7 @@ $(document).ready(function() {
     </div>
 
     <div id="buttons">
-        <label><input type="checkbox" id="editable"/>Editable form</label>
+        <label><input type="checkbox" id="editable" checked="checked"/>Editable form</label>
         <input type="button" id="serialize" value="Serialize"/>
         <input type="button" id="serialize-deserialize" value="Serialize / Deserialize"/>
     </div>

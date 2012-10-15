@@ -14,4 +14,5 @@ Usage
 -----
 A simple example is here:
 
+  https://github.com/knipknap/SpiffForm/blob/master/form.js
   https://github.com/knipknap/SpiffForm/blob/master/index.html
