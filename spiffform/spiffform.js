@@ -107,6 +107,14 @@ var _SpiffFormObjectSerializer = function() {
         return this.deserialize_element(new SpiffFormSeparator(), data);
     };
 
+    this.serialize_namefield = function(obj) {
+        return this.serialize_element(obj);
+    };
+
+    this.deserialize_namefield = function(data) {
+        return this.deserialize_element(new SpiffFormNameField(), data);
+    };
+
     this.serialize_entryfield = function(obj) {
         return this.serialize_element(obj);
     };
@@ -473,6 +481,92 @@ var SpiffFormSeparator = function() {
 
 SpiffFormSeparator.prototype = new SpiffFormElement();
 spiffform_elements.separator = SpiffFormSeparator;
+
+// -------------------------------------
+// Fields for firstname and lastname
+// -------------------------------------
+var SpiffFormNameField = function() {
+    this._name = 'Name Field';
+    this._label = 'Firstname/Lastname';
+    this._value = ['', ''];
+    var that = this;
+
+    this.get_handle = function() {
+        return 'namefield';
+    };
+
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<label>' + that._get_label_html() + '</label>' +
+                         '<div>' +
+                         '<input type="text" name="firstname"/>' +
+                         '<input type="text" name="lastname"/>' +
+                         '</div>');
+        that._div.append('<span class="spiffform-item-error"></span>');
+        var first = that._div.find('input[name="firstname"]');
+        first.val(that._value[0]);
+        first.bind('keyup mouseup change', function() {
+            that._value[0] = $(this).val();
+            that.validate();
+        });
+        var last = that._div.find('input[name="lastname"]');
+        last.val(that._value[1]);
+        last.bind('keyup mouseup change', function() {
+            that._value[1] = $(this).val();
+            that.validate();
+        });
+    };
+
+    this.update_properties = function(elem) {
+        // Label text.
+        elem.append(this._get_label_entry());
+
+        // Required checkbox.
+        elem.append(this._get_required_checkbox());
+    };
+
+    this.set_text = function(text) {
+        throw new Error('Name fields have no set_text()');
+    };
+
+    this.set_firstname = function(text) {
+        this._value[0] = text;
+        this.update();
+    };
+
+    this.set_lastname = function(text) {
+        this._value[1] = text;
+        this.update();
+    };
+
+    this.validate = function() {
+        if (this._required &&
+            (this._value[0] === '' || this._value[1] === '')) {
+            this.set_error('This field is required.');
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_namefield(this);
+    };
+
+    this.deserialize = function(serializer, data) {
+        return serializer.deserialize_namefield(this, data);
+    };
+};
+
+SpiffFormNameField.prototype = new SpiffFormElement();
+spiffform_elements.namefield = SpiffFormNameField;
 
 // -----------------------
 // Entry Box

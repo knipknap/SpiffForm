@@ -91,6 +91,14 @@ height: 1px;
 background: #bbb;
 }
 
+.spiffform-item-namefield input {
+display: inline-block;
+margin: 0 3px 3px 3px;
+padding: 3px;
+width: 325px;
+border: 1px solid #aaa;
+}
+
 .spiffform-item-entryfield input,
 .spiffform-item-datepicker input,
 .spiffform-item-dropdownlist select,

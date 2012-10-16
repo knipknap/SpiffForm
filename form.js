@@ -12,6 +12,8 @@ function attach_form(container) {
     var datepicker = form.append(new SpiffFormDatePicker());
     datepicker.set_label('Birth Date');
 
+    form.append(new SpiffFormNameField());
+
     var entry = form.append(new SpiffFormEntryField());
     entry.set_label('Complaint summary');
     entry.set_text('Stop sending me emails');

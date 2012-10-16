@@ -73,6 +73,10 @@ background-position: 0 .5em;
 padding: .5em 0 .5em 30px;
 }
 
+#ui-name {
+background-image: url('spiffform/res/entry.png');
+}
+
 #ui-entry {
 background-image: url('spiffform/res/entry.png');
 }
