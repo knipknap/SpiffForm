@@ -246,8 +246,7 @@ var SpiffFormElement = function() {
         var input = elem.find('input');
         input.val(this._label);
         input.bind('keyup mouseup change', function() {
-            that._label = $(this).val();
-            that.update();
+            that.set_label($(this).val());
         });
         return elem;
     };
@@ -260,8 +259,7 @@ var SpiffFormElement = function() {
                      '</div>');
         elem.find('input').prop('checked', this._required);
         elem.find('input').click(function(e) {
-            that._required = $(this).is(':checked');
-            that.update();
+            that.set_required($(this).is(':checked'));
         });
         return elem;
     };
@@ -276,7 +274,7 @@ var SpiffFormElement = function() {
 
     this.set_label = function(label) {
         this._label = label;
-        return this.trigger('changed');
+        this.update();
     };
 
     this.set_error = function(text) {
@@ -292,7 +290,7 @@ var SpiffFormElement = function() {
 
     this.required = function(required) {
         this._required = required;
-        return this.trigger('changed');
+        this.update();
     };
 
     this.validate = function() {
