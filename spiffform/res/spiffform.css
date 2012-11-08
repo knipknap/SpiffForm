@@ -1,0 +1,243 @@
+.spiffform {
+font-family: sans-serif;
+border: 1px solid #888888;
+background: #f0f2f8;
+color: #000;
+width: 680px;
+margin: 0 auto;
+padding: 10px 20px;
+text-align: center;
+}
+
+.spiffform-elements {
+list-style-type: none;
+margin: 0 auto;
+padding: 4px 0 10px 10px;
+}
+
+.spiffform-placeholder {
+border: 1px dashed #fd5;
+background: #ffd;
+}
+
+.spiffform-item {
+padding-left: -10px;
+margin-left: -10px;
+background: #f0f2f8;
+border: 1px solid #f0f2f8;
+}
+
+.spiffform-editor .spiffform-item:hover {
+background: #fffad7;
+border: 1px dashed #fe1;
+}
+
+.spiffform-editor .spiffform-item-selected {
+background: #ffef78;
+border: 1px dashed #b69c00;
+}
+
+.spiffform-editor .spiffform-item-selected:hover {
+background: #fffad7;
+border: 1px dashed #fa1;
+}
+
+.spiffform-item label {
+display: block;
+clear: both;
+text-align: left;
+margin: 3px;
+margin-top: 8px;
+}
+
+.spiffform-required {
+color: #f00;
+}
+
+.spiffform-item-error {
+display: block;
+color: red;
+text-align: left;
+padding-left: 5px;
+}
+
+.spiffform-item-title input,
+.spiffform-item-subtitle input {
+background: #f0f2f8;
+border: 0;
+margin: 0 auto;
+width: 670px;
+}
+
+.spiffform-item-title input:enabled:hover,
+.spiffform-item-subtitle input:enabled:hover {
+background: #fff;
+}
+
+.spiffform-item-title input {
+font-size: 1.4em;
+color: #700;
+}
+
+.spiffform-item-subtitle input {
+font-size: 1.05em;
+font-weight: normal;
+color: #500;
+}
+
+.spiffform-item-separator hr {
+border: 0;
+height: 1px;
+background: #bbb;
+}
+
+.spiffform-item-namefield input {
+display: inline-block;
+margin: 0 3px 3px 3px;
+padding: 3px;
+width: 325px;
+border: 1px solid #aaa;
+}
+
+.spiffform-item-entryfield input,
+.spiffform-item-datepicker input,
+.spiffform-item-dropdownlist select,
+.spiffform-item-textarea textarea {
+display: block;
+margin: 0 auto;
+width: 670px;
+border: 1px solid #aaa;
+}
+
+.spiffform-item-entryfield input,
+.spiffform-item-datepicker input,
+.spiffform-item-textarea textarea {
+padding: 3px;
+width: 664px;
+}
+
+.spiffform-item-textarea textarea {
+height: 140px;
+}
+
+.spiffform-item-checkbox input {
+margin-right: .8ex;
+}
+
+.spiffform-item-button {
+text-align: right;
+margin: .5em 0;
+}
+
+.spiffform-item-button input {
+display: inline;
+width: auto;
+padding: .3em 1.3em;
+}
+
+.spiffform-hint {
+font-family: serif;
+font-size: 1.3em;
+font-weight: normal;
+color: #53697f;
+border: 1px dashed #f0f2f8;
+}
+
+.spiffform-hint span {
+margin: 3em auto;
+display: inline-block;
+}
+
+.spiffform-hint-arrow-right span {
+padding-right: 35px;
+background-image: url('arrow-right.png');
+background-repeat: no-repeat;
+background-position: top right;
+}
+
+.spiffform-hint-delete {
+background: #ffebeb;
+border: 1px dashed #ffc5c5;
+padding: 0 3em;
+}
+
+.spiffform-hint-error {
+background: #ffebeb;
+border: 1px solid #ffc5c5;
+padding: .8em;
+margin: .2em;
+}
+
+.spiffform-hint-error span {
+margin: 0;
+}
+
+.spiffform-panel {
+margin: 0 5px 15px 5px;
+background: #fefefe;
+border: 2px solid #ffef78;
+display: none;
+}
+
+.spiffform-panel h3 {
+font-size: 1.3em;
+color: #222;
+background-color: #ffef78;
+padding: .4em;
+margin: 0;
+}
+
+.spiffform-panel-content {
+margin: 6px;
+text-align: right;
+}
+
+.spiffform-panel-content div {
+margin: 3px auto;
+}
+
+.spiffform-panel-content input[type=text],
+.spiffform-panel-content textarea {
+width: 180px;
+padding: 3px;
+vertical-align: middle;
+}
+
+.spiffform-panel-content textarea {
+height: 180px;
+}
+
+.spiffform-panel-content input,
+.spiffform-panel-content select,
+.spiffform-panel-content textarea {
+border: 1px solid #aaa;
+}
+
+.spiffform-panel-content textarea {
+height: 180px;
+}
+
+.spiffform-panel-content ul {
+list-style-type: none;
+margin: 0 auto;
+padding: 4px 0 10px 0;
+}
+
+.spiffform-panel-content li {
+text-align: right;
+margin-left: 18px;
+}
+
+.spiffform-panel-content ul input[type=text] {
+display: inline-block;
+float: left;
+margin: 2px 0;
+width: 194px;
+}
+
+.spiffform-panel-content ul input[type=button] {
+display: inline-block;
+margin: 2px 0 2px 3px;
+width: 20px;
+height: 24px;
+}

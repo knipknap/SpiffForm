@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>Form Editor - SpiffForm Demo</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+  <link rel="stylesheet" href="spiffform/res/spiffform.css" />
+  <link rel="stylesheet" href="default.css" />
+  <link rel="stylesheet" type="text/css"
+    href="lib/jquery-ui.css"/>
+</head>
+
+<script src="lib/jquery.min.js" type="text/javascript"></script>
+<script src="lib/jquery-ui.min.js" type="text/javascript"></script>
+<script src="spiffform/spiffform.js" type="text/javascript"></script>
+<script src="form.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    var form = attach_form($('#form'));
+    var panel = new SpiffFormPanel($('#panel'));
+    form.attach_panel(panel);
+    form.make_editable();
+
+    // select a form item to make the preferences visible.
+    form.select($('#form').find('.spiffform-item:nth(3)').data('obj'));
+
+    $('#sidebar-elements').slideDown("slow");
+
+    $(".ui-elements li").each(function() {
+        $(this).draggable({
+            "helper": function() {
+                return $(this).clone();
+            },
+            // "cursorAt" is important: make sure that the cursor is beneath
+            // (=not on top of) the dragged element, else "form.insert_at()"
+            // might not find the right target position for the new element.
+            "cursorAt": {'right': -5},
+            "stop": function(event, ui) {
+                var cls = spiffform_elements[$(this).attr('name')];
+                var obj = form.insert_at(event, new cls());
+                if (obj)
+                    form.select(obj);
+            }
+        });
+    });
+
+    $('#editable').click(function() {
+        if ($(this).is(':checked')) {
+            $('#sidebar-elements').slideDown("slow");
+            form.make_editable();
+        }
+        else {
+            $('#sidebar-elements').slideUp("slow");
+            form.make_editable(false);
+        }
+    });
+
+    $('#serialize').click(function() {
+        alert(form.serialize(SpiffFormJSONSerializer));
+    });
+
+    $('#serialize-deserialize').click(function() {
+        form.deserialize(SpiffFormJSONSerializer, form.serialize(SpiffFormJSONSerializer));
+    });
+});
+</script>
+
+<body>
+
+<div id="header"><h1>Form Editor - SpiffForm Demo</h1></div>
+<div id="wrap">
+  <div id="center">
+    <div id="form">
+    </div>
+  </div>
+
+  <div id="sidebar">
+    <div id="panel" class="spiffform-panel"></div>
+
+    <div id="sidebar-elements">
+      <h3>Standard Fields</h3>
+      <ul class="ui-elements">
+        <li id="ui-name" name="namefield">Firstname and Lastname</li>
+      </ul>
+
+      <h3>Text Input</h3>
+      <ul class="ui-elements">
+        <li id="ui-entry" name="entryfield">Text Field (single line)</li>
+        <li id="ui-text" name="textarea">Text Area (multi line)</li>
+      </ul>
+
+      <!-- h3>Buttons</h3>
+      <ul class="ui-elements">
+        <li id="ui-button" name="button">Submit Form</li>
+      </ul -->
+
+      <h3>Other Elements</h3>
+      <ul class="ui-elements">
+        <li id="ui-checkbox" name="checkbox">Checkbox</li>
+        <li id="ui-calendar" name="datepicker">Date Picker</li>
+        <li id="ui-combo" name="dropdownlist">Dropdown List</li>
+        <li id="ui-separator" name="separator">Separator</li>
+      </ul>
+    </div>
+
+    <div id="buttons">
+        <label><input type="checkbox" id="editable" checked="checked"/>Editable form</label>
+        <input type="button" id="serialize" value="Serialize"/>
+        <input type="button" id="serialize-deserialize" value="Serialize / Deserialize"/>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
