@@ -1249,21 +1249,18 @@ var SpiffForm = function(div) {
             throw new Error('object is required argument');
 
         // Make sure that the element was dropped within this form.
-        var pointing_at = event.toElement;
-        if (!pointing_at)
-            pointing_at = event.relatedTarget;
-        if (!pointing_at)
-            pointing_at = document.elementFromPoint(event.pageX, event.pageY);
-        var target = $(pointing_at);
-        if (!target.parents().andSelf().filter('.spiffform').length)
+        var pointing_at = event.target;
+        var target = $(event.target);
+        if (!target.parents().andSelf().filter('.spiffform').length) {
             return;
+        }
 
         // Insert at the appropriate position, or append if this is the first item.
         var elem = this._attach(obj);
         if (!target.is('li'))
             target = target.parents('li').first();
         if (target.is('.spiffform-item:not(.spiffform-item-fixed)'))
-            elem.insertBefore(target);
+            elem.insertAfter(target);
         else if (target.is('.spiffform-item')) {
             // Dropped on the form header.
             elem.insertAfter(this._div.find('.spiffform-item-fixed:last'));
