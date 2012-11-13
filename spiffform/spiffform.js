@@ -215,9 +215,9 @@ var SpiffFormJSONSerializer = new _SpiffFormJSONSerializer();
 var spiffform_elements = {};
 
 var SpiffFormElement = function() {
-    this._name = 'unnamed';
+    this._name = $.i18n._('unnamed');
     this._div = undefined;
-    this._label = 'Label';
+    this._label = $.i18n._('Label');
     this._required = true;
     this._value = undefined;
     this._id = (new Date()).getTime();
@@ -242,7 +242,7 @@ var SpiffFormElement = function() {
     // Returns DOM for an entry box for editing the element's label.
     this._get_label_entry = function() {
         var that = this;
-        var elem = $('<div><label>Label: <input type="text"/></label></div>');
+        var elem = $('<div><label>'+$.i18n._('Label')+': <input type="text"/></label></div>');
         var input = elem.find('input');
         input.val(this._label);
         input.bind('keyup mouseup change', function() {
@@ -255,7 +255,9 @@ var SpiffFormElement = function() {
     this._get_required_checkbox = function() {
         var that = this;
         var elem = $('<div>' +
-                     '<label><input type="checkbox"/> Required field</label>' +
+                     '<label><input type="checkbox"/> ' +
+                     $.i18n._('Required field') +
+                    '</label>' +
                      '</div>');
         elem.find('input').prop('checked', this._required);
         elem.find('input').click(function(e) {
@@ -317,8 +319,8 @@ SpiffFormElement.prototype = new SpiffFormTrackable();
 // Title
 // -----------------------
 var SpiffFormTitle = function() {
-    this._name = 'Title';
-    this._value = 'Untitled';
+    this._name = $.i18n._('Title');
+    this._value = $.i18n._('Untitled');
     var that = this;
 
     this.get_handle = function() {
@@ -391,8 +393,8 @@ spiffform_elements.title = SpiffFormTitle;
 // Subtitle
 // -----------------------
 var SpiffFormSubtitle = function() {
-    this._name = 'Subtitle';
-    this._value = 'Please fill out the form';
+    this._name = $.i18n._('Subtitle');
+    this._value = $.i18n._('Please fill out the form');
     var that = this;
 
     this.get_handle = function() {
@@ -444,8 +446,8 @@ spiffform_elements.subtitle = SpiffFormSubtitle;
 // Horizontal Separator
 // -----------------------
 var SpiffFormSeparator = function() {
-    this._name = 'Separator';
-    this._value = 'Please fill out the form';
+    this._name = $.i18n._('Separator');
+    this._value = null;
     var that = this;
 
     this.get_handle = function() {
@@ -484,8 +486,8 @@ spiffform_elements.separator = SpiffFormSeparator;
 // Fields for firstname and lastname
 // -------------------------------------
 var SpiffFormNameField = function() {
-    this._name = 'Name Field';
-    this._label = 'Firstname/Lastname';
+    this._name = $.i18n._('Name Field');
+    this._label = $.i18n._('Firstname/Lastname');
     this._value = ['', ''];
     var that = this;
 
@@ -570,7 +572,7 @@ spiffform_elements.namefield = SpiffFormNameField;
 // Entry Box
 // -----------------------
 var SpiffFormEntryField = function() {
-    this._name = 'Entry Field';
+    this._name = $.i18n._('Entry Field');
     this._value = '';
     var that = this;
 
@@ -603,7 +605,7 @@ var SpiffFormEntryField = function() {
 
         // Default value.
         var that = this;
-        elem.append('<label>Default: <input type="text" name="default"/></label>');
+        elem.append('<label>'+ $.i18n._('Default') + ': <input type="text" name="default"/></label>');
         var input = elem.find('input[name=default]');
         input.val(this._value);
         input.bind('keyup mouseup change', function() {
@@ -645,7 +647,7 @@ spiffform_elements.entryfield = SpiffFormEntryField;
 // Text Box
 // -----------------------
 var SpiffFormTextArea = function() {
-    this._name = 'Text Area';
+    this._name = $.i18n._('Text Area');
     this._value = '';
     var that = this;
 
@@ -720,7 +722,7 @@ spiffform_elements.textarea = SpiffFormTextArea;
 // Button
 // -----------------------
 var SpiffFormButton = function() {
-    this._name = 'Button';
+    this._name = $.i18n._('Button');
     var that = this;
 
     this.get_handle = function() {
@@ -759,8 +761,8 @@ spiffform_elements.button = SpiffFormButton;
 // Checkbox
 // -----------------------
 var SpiffFormCheckbox = function() {
-    this._label = 'Please send more spam to my inbox';
-    this._name = 'Checkbox';
+    this._label = $.i18n._('Please send more spam to my inbox');
+    this._name = $.i18n._('Checkbox');
     this._value = false;
     var that = this;
 
@@ -836,8 +838,8 @@ spiffform_elements.checkbox = SpiffFormCheckbox;
 // -----------------------
 var SpiffFormDatePicker = function() {
     this.handle = 'calendar';
-    this._name = 'Date Picker';
-    this._label = 'Date';
+    this._name = $.i18n._('Date Picker');
+    this._label = $.i18n._('Date');
     var that = this;
 
     this.get_handle = function() {
@@ -927,8 +929,8 @@ spiffform_elements.datepicker = SpiffFormDatePicker;
 // Dropdown List
 // -----------------------
 var SpiffFormDropdownList = function() {
-    this._name = 'Dropdown List';
-    this._label = 'Please choose';
+    this._name = $.i18n._('Dropdown List');
+    this._label = $.i18n._('Please choose');
     this._items = [];
     var that = this;
 
@@ -969,7 +971,7 @@ var SpiffFormDropdownList = function() {
 
         // List of options.
         var that = this;
-        elem.append('<div><label>Options:</label><ul></ul></div>');
+        elem.append('<div><label>' + $.i18n._('Options') + ':</label><ul></ul></div>');
         var ul = elem.find('ul');
 
         // Click handler for the delete buttons in the option list.
@@ -1037,7 +1039,7 @@ var SpiffFormDropdownList = function() {
             append_entry('');
 
         // Initial value.
-        elem.append('<div><label>Default:</label></div>');
+        elem.append('<div><label>' + $.i18n._('Default') + ':</label></div>');
         var select = this._get_select_elem();
         elem.children('div:last').append(select);
         select.change(function() {
@@ -1154,15 +1156,15 @@ var SpiffForm = function(div) {
         elem.removeClass('spiffform-hint-delete');
         elem.removeClass('spiffform-hint-error');
         if (hint == 'drag') {
-            span.text('Drag form elements from the right');
+            span.text($.i18n._('Drag form elements from the right'));
             elem.addClass('spiffform-hint-arrow-right');
         }
         else if (hint == 'delete') {
-            span.text('Drop here to remove');
+            span.text($.i18n._('Drop here to remove'));
             elem.addClass('spiffform-hint-delete');
         }
         else if (hint === 'validationerror') {
-            span.text('Please correct the errors above.');
+            span.text($.i18n._('Please correct the errors above.'));
             elem.addClass('spiffform-hint-error');
             elem.slideDown().delay(2000).slideUp();
             return;
@@ -1463,7 +1465,7 @@ var SpiffFormPanel = function(panel_div) {
     // Show properties for the given item.
     this.show_properties = function(obj) {
         this._panel.empty();
-        this._panel.append('<h3>' + obj._name + ' Properties</h3>' +
+        this._panel.append('<h3>' + obj._name + ' ' + $.i18n._('Properties') + '</h3>' +
                            '<div class="spiffform-panel-content"></div>');
         obj.update_properties(this._panel.find('div'));
         this._panel.slideDown("slow");
