@@ -1249,8 +1249,7 @@ var SpiffForm = function(div) {
             throw new Error('object is required argument');
 
         // Make sure that the element was dropped within this form.
-        var pointing_at = event.target;
-        var target = $(event.target);
+        var target = $(document.elementFromPoint(event.clientX, event.clientY));
         if (!target.parents().andSelf().filter('.spiffform').length) {
             return;
         }
