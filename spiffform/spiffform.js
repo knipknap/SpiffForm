@@ -1250,12 +1250,16 @@ var SpiffForm = function(div) {
         if (typeof obj === 'undefined')
             throw new Error('object is required argument');
 
+        // Check if we have the needed property
+        if (!event.hasOwnProperty('clientX') && 
+            !event.hasOwnProperty('clientY')) {
+          event = event.originalEvent;
+        }
         // Make sure that the element was dropped within this form.
         var target = $(document.elementFromPoint(event.clientX, event.clientY));
         if (!target.parents().andSelf().filter('.spiffform').length) {
             return;
         }
-
         // Insert at the appropriate position, or append if this is the first item.
         var elem = this._attach(obj);
         if (!target.is('li'))
