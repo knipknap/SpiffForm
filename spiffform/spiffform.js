@@ -1253,7 +1253,6 @@ var SpiffForm = function(div) {
         // Make sure that the element was dropped within this form.
         var target = $(document.elementFromPoint(event.clientX, event.clientY));
         if (!target.parents().andSelf().filter('.spiffform').length) {
-            console.log("foo");
             return;
         }
 
