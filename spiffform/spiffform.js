@@ -70,6 +70,7 @@ var SpiffFormTrackable = function() {
 
 var _SpiffFormObjectSerializer = function() {
     this.serialize_element = function(obj) {
+        console.log(obj._required);
         return {'handle': obj.get_handle(),
                 'label': obj._label,
                 'value': obj._value,
@@ -274,6 +275,10 @@ var SpiffFormElement = function() {
         throw new Error("SpiffFormElement object missing update_properties().");
     };
 
+    this.set_required = function(required) {
+        this._required = required;
+    };
+
     this.set_label = function(label) {
         this._label = label;
         this.update();
@@ -297,7 +302,7 @@ var SpiffFormElement = function() {
 
     this.validate = function() {
         if (this._required && typeof this._value === 'undefined') {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         this.set_error();
@@ -370,7 +375,7 @@ var SpiffFormTitle = function() {
 
     this.validate = function() {
         if (this._required && this._value === '') {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         this.set_error(undefined);
@@ -549,7 +554,7 @@ var SpiffFormNameField = function() {
     this.validate = function() {
         if (this._required &&
             (this._value[0] === '' || this._value[1] === '')) {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         this.set_error(undefined);
@@ -624,7 +629,7 @@ var SpiffFormEntryField = function() {
 
     this.validate = function() {
         if (this._required && this._value === '') {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         this.set_error(undefined);
@@ -699,7 +704,7 @@ var SpiffFormTextArea = function() {
 
     this.validate = function() {
         if (this._required && this._value === '') {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         this.set_error(undefined);
@@ -814,7 +819,7 @@ var SpiffFormCheckbox = function() {
 
     this.validate = function() {
         if (this._required && !this._value) {
-            this.set_error('This box must be checked to continue.');
+            this.set_error($.i18n._('This box must be checked to continue.'));
             return false;
         }
         this.set_error(undefined);
@@ -906,7 +911,7 @@ var SpiffFormDatePicker = function() {
 
     this.validate = function() {
         if (this._required && this._value === null) {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         this.set_error(undefined);
@@ -1062,12 +1067,12 @@ var SpiffFormDropdownList = function() {
 
     this.validate = function() {
         if (this._required && typeof this._value === undefined) {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         var selected_text = this._items[this._value];
         if (this._required && selected_text === '') {
-            this.set_error('This field is required.');
+            this.set_error($.i18n._('This field is required.'));
             return false;
         }
         this.set_error(undefined);

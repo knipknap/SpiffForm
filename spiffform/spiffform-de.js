@@ -5,6 +5,8 @@ var translation = {
   'Label': 'Beschriftung',
   'Firstname/Lastname': 'Vorname/Nachname',
   'Please send more spam to my inbox': 'Bestätigen Sie das Formular',
+  'This field is required.': 'Dies ist ein Pflichtfeld.',
+  'This box must be checked to continue.': 'Dieses Feld muss aktiviert werden.',
   'Date': 'Datum',
   'Please choose': 'Auswählen',
   'Required field': 'Pflichtfeld',
