@@ -101,6 +101,10 @@ background-image: url('spiffform/res/calendar.png');
 background-image: url('spiffform/res/combo.png');
 }
 
+#ui-radio {
+background-image: url('spiffform/res/radio.png');
+}
+
 #ui-separator {
 background-image: url('spiffform/res/separator.png');
 }
