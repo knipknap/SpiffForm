@@ -25,7 +25,9 @@ var translation = {
   'Button': 'Schaltfläche',
   'Checkbox': 'Ankreuzfeld',
   'Date Picker': 'Datumsfeld',
-  'Dropdown List': 'Dropdownliste'
+  'Dropdown List': 'Dropdownliste',
+  'Radio List': 'Optionsfeld',
+  'Select one': 'Bitte eines auswählen'
 };
 $(document).ready(function() {
   $.i18n.setDictionary(translation);

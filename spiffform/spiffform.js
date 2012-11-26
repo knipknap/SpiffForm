@@ -70,7 +70,6 @@ var SpiffFormTrackable = function() {
 
 var _SpiffFormObjectSerializer = function() {
     this.serialize_element = function(obj) {
-        console.log(obj._required);
         return {'handle': obj.get_handle(),
                 'label': obj._label,
                 'value': obj._value,
@@ -170,6 +169,19 @@ var _SpiffFormObjectSerializer = function() {
         var obj = this.deserialize_element(new SpiffFormDropdownList(), data);
         for (var i = 0, len = data.items.length; i < len; i++)
             obj.add_option(data.items[i]);
+        return obj;
+    };
+
+    this.serialize_radiolist = function(obj) {
+        var data = this.serialize_element(obj);
+        data.items = obj._items.slice(0);
+        return data;
+    };
+
+    this.deserialize_radiolist = function(data) {
+        var obj = this.deserialize_element(new SpiffFormRadioList(), data);
+        for (var i = 0, len = data.items.length; i < len; i++)
+            obj.add_radio(data.items[i]);
         return obj;
     };
 
@@ -988,6 +1000,180 @@ var SpiffFormDropdownList = function() {
             that.update();
         }
 
+        // Handler for 'changed' events from the radio list.
+        function entry_changed() {
+            var li = $(this).parent();
+            var index = li.index();
+            var is_last = li.is(':last');
+
+            // If all entry boxes are now filled, add another.
+            var empty = ul.find('input:text[value=""]');
+            if (empty.length === 0)
+                append_entry('');
+
+            // Was an existing entry changed, or was the last, empty box
+            // changed? (The last entry box may not have a corresponding entry
+            // in our array yet.)
+            if (!is_last) {
+                that._items[index] = $(this).val();
+                that.update();
+            }
+
+            // If the last entry box was cleared, remove the entry
+            // from our internal array, but leave the entry box available.
+            if ($(this).val() === '') {
+                if (index < that._items.length)
+                    that._items.splice(index, 1);
+                that.update();
+            }
+
+            // If the last entry box was filled, update our internal
+            // array, and add another entry box.
+            if (index < that._items.length)
+                that._items[index] = $(this).val();
+            if (index >= that._items.length)
+                that._items.push($(this).val());
+            that.update();
+        }
+
+        // Appends one li to the option list.
+        function append_entry(value) {
+            ul.append('<li>' +
+                      '<input type="text"/><input type="button" value="-"/>' +
+                      '</li>');
+            var li = ul.find('li:last');
+            var input = li.find('input[type=text]');
+            input.val(value);
+            input.bind('keyup mouseup change', entry_changed);
+            li.find('input[type=button]').click(delete_button_clicked);
+        }
+
+        // Create the entries in the radio list.
+        for (var i = 0, len = this._items.length; i < len || i < 2; i++)
+            append_entry(this._items[i]);
+        var empty = ul.find('input:text[value=""]');
+        if (empty.length === 0)
+            append_entry('');
+
+        // Initial value.
+        elem.append('<div><label>' + $.i18n._('Default') + ':</label></div>');
+        var select = this._get_select_elem();
+        elem.children('div:last').append(select);
+        select.change(function() {
+            that.select($(this).val());
+        });
+
+        // Required checkbox.
+        elem.append(this._get_required_checkbox());
+    };
+
+    this.add_option = function(option) {
+        this._items.push(option);
+        this.update();
+    };
+
+    this.select = function(option) {
+        this._value = option;
+        this.update();
+    };
+
+    this.validate = function() {
+        if (this._required && typeof this._value === undefined) {
+            this.set_error($.i18n._('This field is required.'));
+            return false;
+        }
+        var selected_text = this._items[this._value];
+        if (this._required && selected_text === '') {
+            this.set_error($.i18n._('This field is required.'));
+            return false;
+        }
+        this.set_error(undefined);
+        return true;
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_dropdownlist(this);
+    };
+
+    this.deserialize = function(serializer, data) {
+        return serializer.deserialize_dropdownlist(this, data);
+    };
+};
+
+SpiffFormDropdownList.prototype = new SpiffFormElement();
+spiffform_elements.dropdownlist = SpiffFormDropdownList;
+
+// -----------------------
+// Radio List
+// -----------------------
+var SpiffFormRadioList = function() {
+    this._name = $.i18n._('Radio List');
+    this._label = $.i18n._('Select one');
+    this._items = [];
+    var that = this;
+
+    this.get_handle = function() {
+        return 'radiolist';
+    };
+
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this._get_radio_elem = function(with_class) {
+        var options = {};
+        if (with_class) {
+          options = {"class": "spiffform-item-radio"};
+        }
+        var p = $('<p/>', options);
+        var radio_count = $('.spiffform-item-radio').length;
+        for (var i = 0, len = this._items.length; i < len; i++) {
+            radio = $('<input type="radio" value="' + i + '" name="radio' + radio_count + '"/>');
+            radio.attr("checked", false);
+            if (i == this._value) {
+              radio.attr("checked", true);
+            }
+            p.append(radio);
+            p.append(this._items[i]);
+            p.append('</br>');
+        }
+        p.val(this._value);
+        return p;
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<label>'+ that._get_label_html() + '</label>');
+        var p = that._get_radio_elem(true);
+        that._div.find('label').append(p);
+        that._div.append('<span class="spiffform-item-error"></span>');
+        p.find('input').click(function() {
+            that.select($(this).val());
+            that.validate();
+        });
+    };
+
+    this.update_properties = function(elem) {
+        // Label text.
+        elem.append(this._get_label_entry());
+
+        // List of options.
+        var that = this;
+        elem.append('<div><label>' + $.i18n._('Options') + ':</label><ul></ul></div>');
+        var ul = elem.find('ul');
+
+        // Click handler for the delete buttons in the option list.
+        function delete_button_clicked() {
+            var index = $(this).parent().index();
+            if (index < that._items.length)
+                that._items.splice(index, 1);
+            $(this).parent().remove();
+            that.update();
+        }
+
         // Handler for 'changed' events from the option list.
         function entry_changed() {
             var li = $(this).parent();
@@ -1045,9 +1231,9 @@ var SpiffFormDropdownList = function() {
 
         // Initial value.
         elem.append('<div><label>' + $.i18n._('Default') + ':</label></div>');
-        var select = this._get_select_elem();
-        elem.children('div:last').append(select);
-        select.change(function() {
+        var p = this._get_radio_elem(false);
+        elem.children('div:last').append(p);
+        p.find('input').click(function() {
             that.select($(this).val());
         });
 
@@ -1055,13 +1241,13 @@ var SpiffFormDropdownList = function() {
         elem.append(this._get_required_checkbox());
     };
 
-    this.add_option = function(option) {
-        this._items.push(option);
+    this.add_radio = function(radio) {
+        this._items.push(radio);
         this.update();
     };
 
-    this.select = function(option) {
-        this._value = option;
+    this.select = function(radio) {
+        this._value = radio;
         this.update();
     };
 
@@ -1080,16 +1266,16 @@ var SpiffFormDropdownList = function() {
     };
 
     this.serialize = function(serializer) {
-        return serializer.serialize_dropdownlist(this);
+        return serializer.serialize_radiolist(this);
     };
 
     this.deserialize = function(serializer, data) {
-        return serializer.deserialize_dropdownlist(this, data);
+        return serializer.deserialize_radiolist(this, data);
     };
 };
 
-SpiffFormDropdownList.prototype = new SpiffFormElement();
-spiffform_elements.dropdownlist = SpiffFormDropdownList;
+SpiffFormRadioList.prototype = new SpiffFormElement();
+spiffform_elements.radiolist = SpiffFormRadioList;
 
 // ======================================================================
 // Form
