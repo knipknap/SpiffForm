@@ -12,7 +12,7 @@ function attach_form(container) {
     var datepicker = form.append(new SpiffFormDatePicker());
     datepicker.set_label('Birth Date');
 
-    form.append(new SpiffFormNameField());
+    form.append(new SpiffFormPartsField());
 
     var entry = form.append(new SpiffFormEntryField());
     entry.set_label('Complaint summary');
