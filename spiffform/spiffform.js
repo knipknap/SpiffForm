@@ -73,6 +73,7 @@ var _SpiffFormObjectSerializer = function() {
         return {'handle': obj.get_handle(),
                 'label': obj._label,
                 'value': obj._value,
+                'option': obj._option,
                 'required': obj._required};
     };
 
@@ -80,6 +81,7 @@ var _SpiffFormObjectSerializer = function() {
         obj._label = data.label;
         obj._value = data.value;
         obj._required = data.required;
+        obj._option = data.option;
         return obj;
     };
 
@@ -107,12 +109,12 @@ var _SpiffFormObjectSerializer = function() {
         return this.deserialize_element(new SpiffFormSeparator(), data);
     };
 
-    this.serialize_namefield = function(obj) {
+    this.serialize_partsfield = function(obj) {
         return this.serialize_element(obj);
     };
 
-    this.deserialize_namefield = function(data) {
-        return this.deserialize_element(new SpiffFormNameField(), data);
+    this.deserialize_partsfield = function(data) {
+        return this.deserialize_element(new SpiffFormPartsField(), data);
     };
 
     this.serialize_entryfield = function(obj) {
@@ -500,16 +502,18 @@ SpiffFormSeparator.prototype = new SpiffFormElement();
 spiffform_elements.separator = SpiffFormSeparator;
 
 // -------------------------------------
-// Fields for firstname and lastname
+// Fields for firstfield and secondfield
 // -------------------------------------
-var SpiffFormNameField = function() {
-    this._name = $.i18n._('Name Field');
-    this._label = $.i18n._('Firstname/Lastname');
+var SpiffFormPartsField = function() {
+    this._name = $.i18n._('Parts Field');
+    this._label = $.i18n._('Firstfield/Secondfield');
     this._value = ['', ''];
+    this._items = ['1/2', '1/3', '2/3'];
+    this._option = "1/2";
     var that = this;
 
     this.get_handle = function() {
-        return 'namefield';
+        return 'partsfield';
     };
 
     this.attach = function(div) {
@@ -523,28 +527,62 @@ var SpiffFormNameField = function() {
         that._div.empty();
         that._div.append('<label>' + that._get_label_html() + '</label>' +
                          '<div>' +
-                         '<input type="text" name="firstname"/>' +
-                         '<input type="text" name="lastname"/>' +
+                         '<input type="text" name="firstfield"/>' +
+                         '<input type="text" name="secondfield"/>' +
                          '</div>');
         that._div.append('<span class="spiffform-item-error"></span>');
-        var first = that._div.find('input[name="firstname"]');
+        var first = that._div.find('input[name="firstfield"]');
         first.val(that._value[0]);
         first.bind('keyup mouseup change', function() {
             that._value[0] = $(this).val();
             that.validate();
         });
-        var last = that._div.find('input[name="lastname"]');
+        var last = that._div.find('input[name="secondfield"]');
         last.val(that._value[1]);
         last.bind('keyup mouseup change', function() {
             that._value[1] = $(this).val();
             that.validate();
         });
+        this._set_fieldsize(that._option);
+    };
+
+    this._get_select_elem = function() {
+        var select = $('<select></select>');
+        for (var i = 0, len = this._items.length; i < len; i++)
+            select.append('<option value="' + this._items[i] + '">' + this._items[i] + '</option>');
+        select.val(this._option);
+        return select;
+    };
+
+    this._set_fieldsize = function(option) {
+        switch (option) {
+          case "1/2":
+            that._div.find('input[name="firstfield"]').css("width", "325px");
+            that._div.find('input[name="secondfield"]').css("width", "325px");
+            break;
+          case "1/3":
+            that._div.find('input[name="firstfield"]').css("width", "215px");
+            that._div.find('input[name="secondfield"]').css("width", "435px");
+            break;
+          case "2/3":
+            that._div.find('input[name="firstfield"]').css("width", "435px");
+            that._div.find('input[name="secondfield"]').css("width", "215px");
+            break;
+          default:
+            break;
+        }
     };
 
     this.update_properties = function(elem) {
         // Label text.
         elem.append(this._get_label_entry());
-
+        elem.append(that._get_select_elem());
+        var select = elem.find('select');
+        select.change(function() {
+            var option = $(this).val();
+            that._option = option;
+            that._set_fieldsize(option);
+        });
         // Required checkbox.
         elem.append(this._get_required_checkbox());
     };
@@ -553,12 +591,12 @@ var SpiffFormNameField = function() {
         throw new Error('Name fields have no set_text()');
     };
 
-    this.set_firstname = function(text) {
+    this.set_firstfield = function(text) {
         this._value[0] = text;
         this.update();
     };
 
-    this.set_lastname = function(text) {
+    this.set_secondfield = function(text) {
         this._value[1] = text;
         this.update();
     };
@@ -574,16 +612,16 @@ var SpiffFormNameField = function() {
     };
 
     this.serialize = function(serializer) {
-        return serializer.serialize_namefield(this);
+        return serializer.serialize_partsfield(this);
     };
 
     this.deserialize = function(serializer, data) {
-        return serializer.deserialize_namefield(this, data);
+        return serializer.deserialize_partsfield(this, data);
     };
 };
 
-SpiffFormNameField.prototype = new SpiffFormElement();
-spiffform_elements.namefield = SpiffFormNameField;
+SpiffFormPartsField.prototype = new SpiffFormElement();
+spiffform_elements.partsfield = SpiffFormPartsField;
 
 // -----------------------
 // Entry Box
