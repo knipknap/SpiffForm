@@ -923,7 +923,10 @@ var SpiffFormDatePicker = function() {
             onSelect: function(dateText, inst) {
                 that._value = $(this).datepicker('getDate');
                 that.validate();
-            }
+            },
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+0"
         });
         picker.datepicker('setDate', that._value);
 
@@ -951,7 +954,10 @@ var SpiffFormDatePicker = function() {
             onSelect: function(dateText, inst) {
                 that._value = $(this).datepicker('getDate');
                 that.update();
-            }
+            },
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+0"
         });
         picker.datepicker('setDate', that._value);
 
