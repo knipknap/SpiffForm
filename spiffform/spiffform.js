@@ -628,6 +628,7 @@ spiffform_elements.partsfield = SpiffFormPartsField;
 // -----------------------
 var SpiffFormEntryField = function() {
     this._name = $.i18n._('Entry Field');
+    this._label = $.i18n._('Entry Field');
     this._value = '';
     var that = this;
 
@@ -703,6 +704,7 @@ spiffform_elements.entryfield = SpiffFormEntryField;
 // -----------------------
 var SpiffFormTextArea = function() {
     this._name = $.i18n._('Text Area');
+    this._label = $.i18n._('Text Area');
     this._value = '';
     var that = this;
 
