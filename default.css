@@ -108,3 +108,7 @@ background-image: url('spiffform/res/radio.png');
 #ui-separator {
 background-image: url('spiffform/res/separator.png');
 }
+
+#ui-infobox {
+background-image: url('spiffform/res/infobox.png');
+}
