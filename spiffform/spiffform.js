@@ -133,6 +133,14 @@ var _SpiffFormObjectSerializer = function() {
         return this.deserialize_element(new SpiffFormTextArea(), data);
     };
 
+    this.serialize_infobox = function(obj) {
+        return this.serialize_element(obj);
+    }
+
+    this.deserialize_infobox = function(data) {
+        return this.deserialize_element(new SpiffFormInfoBox(), data);
+    }
+
     this.serialize_button = function(obj) {
         return this.serialize_element(obj);
     };
@@ -628,6 +636,7 @@ spiffform_elements.partsfield = SpiffFormPartsField;
 // -----------------------
 var SpiffFormEntryField = function() {
     this._name = $.i18n._('Entry Field');
+    this._label = $.i18n._('Entry Field');
     this._value = '';
     var that = this;
 
@@ -703,6 +712,7 @@ spiffform_elements.entryfield = SpiffFormEntryField;
 // -----------------------
 var SpiffFormTextArea = function() {
     this._name = $.i18n._('Text Area');
+    this._label = $.i18n._('Text Area');
     this._value = '';
     var that = this;
 
@@ -772,6 +782,65 @@ var SpiffFormTextArea = function() {
 
 SpiffFormTextArea.prototype = new SpiffFormElement();
 spiffform_elements.textarea = SpiffFormTextArea;
+
+// -----------------------
+// Message box
+// -----------------------
+var SpiffFormInfoBox = function() {
+    this._name = $.i18n._('Info Box');
+    this._label = $.i18n._('Info Box');
+    this._value = $.i18n._('<h3>Info Box</h3>');
+    var that = this;
+
+    this.get_handle = function() {
+        return 'infobox';
+    };
+
+    this.attach = function(div) {
+        this._div = div;
+        this.update();
+    };
+
+    this.update = function() {
+        if (!that._div)
+            return;
+        that._div.empty();
+        that._div.append('<div></div>');
+        that._div.append('<span class="spiffform-item-error"></span>');
+        var msg_container = that._div.find('div');
+        msg_container.html(that._value);
+    };
+
+    this.update_properties = function(elem) {
+        // message in html
+        var that = this;
+        elem.append('<div><label>Message: <textarea></texarea></label></div>');
+        var textarea = elem.find('textarea');
+        textarea.val(this._value);
+        textarea.bind('keyup mouseup change', function() {
+            that._value = $(this).val();
+            that.update();
+        });
+    };
+
+    this.set_text = function(text) {
+        this._value = text;
+        this.update();
+    };
+
+    this.serialize = function(serializer) {
+        return serializer.serialize_infobox(this);
+    };
+
+    this.deserialize = function(serializer, data) {
+        return serializer.deserialize_infobox(this, data);
+    };
+};
+
+SpiffFormInfoBox.prototype = new SpiffFormElement();
+spiffform_elements.infobox = SpiffFormInfoBox;
+
+
 
 // -----------------------
 // Button
@@ -923,7 +992,10 @@ var SpiffFormDatePicker = function() {
             onSelect: function(dateText, inst) {
                 that._value = $(this).datepicker('getDate');
                 that.validate();
-            }
+            },
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+0"
         });
         picker.datepicker('setDate', that._value);
 
@@ -951,7 +1023,10 @@ var SpiffFormDatePicker = function() {
             onSelect: function(dateText, inst) {
                 that._value = $(this).datepicker('getDate');
                 that.update();
-            }
+            },
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+0"
         });
         picker.datepicker('setDate', that._value);
 
