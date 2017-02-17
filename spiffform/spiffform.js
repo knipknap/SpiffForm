@@ -220,6 +220,8 @@ var _SpiffFormObjectSerializer = function() {
     };
 };
 
+var SpiffFormObjectSerializer = new _SpiffFormObjectSerializer();
+
 var _SpiffFormJSONSerializer = function() {
     this.serialize_form = function(form) {
         return JSON.stringify(Object.getPrototypeOf(this).serialize_form(form));
