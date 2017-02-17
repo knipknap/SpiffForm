@@ -308,6 +308,16 @@ var SpiffFormElement = function() {
         this.update();
     };
 
+    this.get_label = function() {
+        return this._label;
+    };
+
+    this.get_values = function() {
+        var data = {};
+        data[this._label] = this._value;
+        return data;
+    };
+
     this.set_error = function(text) {
         var span = this._div.find('.spiffform-item-error');
         if (span.parents('.spiffform-editor').length ||
@@ -483,6 +493,10 @@ var SpiffFormSeparator = function() {
         return 'separator';
     };
 
+    this.get_values = function() {
+        return {};
+    };
+
     this.attach = function(div) {
         this._div = div;
         this.update();
@@ -516,7 +530,7 @@ spiffform_elements.separator = SpiffFormSeparator;
 // -------------------------------------
 var SpiffFormPartsField = function() {
     this._name = $.i18n._('Parts Field');
-    this._label = $.i18n._('Firstfield/Secondfield');
+    this._label = [$.i18n._('Firstfield'), $.i18n._('Secondfield')];
     this._value = ['', ''];
     this._items = ['1/2', '1/3', '2/3'];
     this._option = "1/2";
@@ -524,6 +538,38 @@ var SpiffFormPartsField = function() {
 
     this.get_handle = function() {
         return 'partsfield';
+    };
+
+    this._get_label_html = function(with_colon) {
+        var label = this._label[0] + '/' + this._label[1];
+        if (with_colon || typeof with_colon === 'undefined')
+            return label + ':' + this._get_required_mark_html();
+        else
+            return label + ' ' + this._get_required_mark_html();
+    };
+
+    // Returns DOM for an entry box for editing the element's label.
+    this._get_label_entry = function() {
+        var that = this;
+        var elem = $('<div>\
+                     <label>'+$.i18n._('Label 1')+': <input type="text"/></label>\
+                     <label>'+$.i18n._('Label 2')+': <input type="text"/></label>\
+                     </div>');
+        var input1 = elem.find('input:eq(0)');
+        var input2 = elem.find('input:eq(1)');
+        input1.val(this._label[0]);
+        input2.val(this._label[1]);
+        elem.find('input').bind('keyup mouseup change', function() {
+            that.set_label([input1.val(), input2.val()]);
+        });
+        return elem;
+    };
+
+    this.get_values = function() {
+        var data = {};
+        data[this._label[0]] = this._value[0];
+        data[this._label[1]] = this._value[1];
+        return data;
     };
 
     this.attach = function(div) {
@@ -853,6 +899,10 @@ var SpiffFormButton = function() {
 
     this.get_handle = function() {
         return 'button';
+    };
+
+    this.get_values = function() {
+        return {};
     };
 
     this.attach = function(div) {
@@ -1735,6 +1785,15 @@ var SpiffForm = function(div) {
         if (has_errors)
             that.set_hint('validationerror');
         return !has_errors;
+    };
+
+    this.get_values = function() {
+        var data = {};
+        this._div.find('li.spiffform-item').each(function() {
+            var obj = $(this).data('obj');
+            $.extend(data, obj.get_values());
+        });
+        return data;
     };
 
     this.serialize = function(serializer) {
