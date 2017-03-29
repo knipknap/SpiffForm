@@ -1086,6 +1086,12 @@ var SpiffFormDatePicker = function() {
         elem.append(this._get_required_checkbox());
     };
 
+    this.get_values = function() {
+        var data = {};
+        data[this._label] = this._value.toISOString().split('T')[0];
+        return data;
+    };
+
     this.validate = function() {
         if (this._required && this._value === null) {
             this.set_error($.i18n._('This field is required.'));
