@@ -1256,6 +1256,12 @@ var SpiffFormDropdownList = function() {
         return true;
     };
 
+    this.get_values = function() {
+        var data = {};
+        data[this._label] = this._items[this._value ? this._value : 0];
+        return data;
+    };
+
     this.serialize = function(serializer) {
         return serializer.serialize_dropdownlist(this);
     };
