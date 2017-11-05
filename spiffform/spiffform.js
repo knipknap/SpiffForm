@@ -1221,7 +1221,7 @@ var SpiffFormDropdownList = function() {
             li.find('input[type=button]').click(delete_button_clicked);
         }
 
-        // Create the entries in the radio list.
+        // Create the entries in the dropdown list.
         for (var i = 0, len = this._items.length; i < len || i < 2; i++)
             append_entry(this._items[i]);
         var empty = ul.find('input:text[value=""]');
