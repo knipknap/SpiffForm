@@ -1178,7 +1178,9 @@ var SpiffFormDropdownList = function() {
             var is_last = li.is(':last');
 
             // If all entry boxes are now filled, add another.
-            var empty = ul.find('input:text[value=""]');
+            var empty = ul.find('input:text').filter(function() {
+                return $(this).val() === "";
+            });
             if (empty.length === 0)
                 append_entry('');
 
