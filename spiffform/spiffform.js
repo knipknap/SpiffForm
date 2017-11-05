@@ -1425,7 +1425,8 @@ var SpiffFormRadioList = function() {
 
     this.select = function(radio) {
         this._value = radio;
-        this.update();
+        this._div.find('input[value=' + radio + ']').prop('checked', true);
+        this.validate();
     };
 
     this.validate = function() {
