@@ -1161,6 +1161,12 @@ var SpiffFormDropdownList = function() {
         var that = this;
         elem.append('<div><label>' + $.i18n._('Options') + ':</label><ul></ul></div>');
         var ul = elem.find('ul');
+        ul.sortable({
+            stop: function(event, ui) {
+                entry_changed();
+                that.update();
+            }
+        });
 
         // Click handler for the delete buttons in the option list.
         function delete_button_clicked() {
