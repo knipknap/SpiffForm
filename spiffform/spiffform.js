@@ -1173,10 +1173,6 @@ var SpiffFormDropdownList = function() {
 
         // Handler for 'changed' events from the radio list.
         function entry_changed() {
-            var li = $(this).parent();
-            var index = li.index();
-            var is_last = li.is(':last');
-
             // If all entry boxes are now filled, add another.
             var empty = ul.find('input:text').filter(function() {
                 return $(this).val() === "";
@@ -1184,28 +1180,12 @@ var SpiffFormDropdownList = function() {
             if (empty.length === 0)
                 append_entry('');
 
-            // Was an existing entry changed, or was the last, empty box
-            // changed? (The last entry box may not have a corresponding entry
-            // in our array yet.)
-            if (!is_last) {
-                that._items[index] = $(this).val();
-                that.update();
-            }
-
-            // If the last entry box was cleared, remove the entry
-            // from our internal array, but leave the entry box available.
-            if ($(this).val() === '') {
-                if (index < that._items.length)
-                    that._items.splice(index, 1);
-                that.update();
-            }
-
-            // If the last entry box was filled, update our internal
-            // array, and add another entry box.
-            if (index < that._items.length)
-                that._items[index] = $(this).val();
-            if (index >= that._items.length)
-                that._items.push($(this).val());
+            // Update the UI.
+            that._items = ul.find('input:text').map(function(){
+                return $(this).val();
+            }).get();
+            if (that._items[that._items.length-1] === '')
+                that._items.slice(-1);
             that.update();
         }
 
